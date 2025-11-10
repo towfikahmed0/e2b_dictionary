@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e2b-dictionary-v1.0.0';
+const CACHE_NAME = 'e2b-dictionary-v1.0.1';
 const urlsToCache = [
   '/',
   './index.html',
@@ -102,4 +102,5 @@ async function updateDictionaryData() {
   } catch (error) {
     console.error('Failed to update dictionary data:', error);
   }
+
 }
