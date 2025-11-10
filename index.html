@@ -140,6 +140,14 @@
             transform: translateY(-3px);
         }
 
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
         header {
             background-color: var(--white);
             box-shadow: var(--shadow);
@@ -170,6 +178,7 @@
         .nav-links {
             display: flex;
             list-style: none;
+            align-items: center;
         }
 
         .nav-links li {
@@ -430,6 +439,10 @@
             background-color: #4a1f1f;
         }
 
+        #installBtn {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .about-grid {
                 grid-template-columns: 1fr;
@@ -543,7 +556,7 @@
                 <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#about">About</a></li>
-                    <li><button id="darkToggle" class="btn">Dark Mode</button></li>
+                    <li><button id="installBtn" class="btn">Install App</button></li>
                 </ul>
                 <div class="menu-toggle"><i class="fas fa-bars"></i></div>
             </nav>
@@ -657,8 +670,47 @@
         const searchInput = document.getElementById('search_txt');
         const suggestionsContainer = document.getElementById('suggestions-container');
         const wordDetails = document.getElementById('word_details');
+        const installBtn = document.getElementById('installBtn');
         let dictionaryData = [];
-        let isDarkMode = false;
+        let deferredPrompt;
+
+        // PWA Install Prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show the install button
+            installBtn.style.display = 'inline-block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            // Show the install prompt
+            deferredPrompt.prompt();
+            
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+                installBtn.style.display = 'none';
+            } else {
+                console.log('User dismissed the install prompt');
+            }
+            
+            // Clear the saved prompt since it can't be used again
+            deferredPrompt = null;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            // Hide the install button
+            installBtn.style.display = 'none';
+            // Clear the deferredPrompt so it can be garbage collected
+            deferredPrompt = null;
+            console.log('PWA was installed');
+        });
 
         // Load dictionary data
         async function loadDictionary() {
@@ -831,31 +883,7 @@
             }
         }
 
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            document.getElementById('darkToggle').textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
-
-            // Save preference to localStorage
-            localStorage.setItem('darkMode', isDarkMode);
-        }
-
-        function initializeDarkMode() {
-            const savedMode = localStorage.getItem('darkMode');
-            if (savedMode !== null) {
-                isDarkMode = JSON.parse(savedMode);
-                document.body.classList.toggle('dark-mode', isDarkMode);
-                document.getElementById('darkToggle').textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                // If no saved preference, use system preference
-                isDarkMode = true;
-                document.body.classList.add('dark-mode');
-                document.getElementById('darkToggle').textContent = 'Light Mode';
-            }
-        }
-
         // Event listeners
-        document.getElementById('darkToggle').addEventListener('click', toggleDarkMode);
         document.querySelector('.menu-toggle').addEventListener('click', () => {
             document.querySelector('.nav-links').classList.toggle('active');
         });
@@ -869,7 +897,6 @@
         });
 
         // Initialize the application
-        initializeDarkMode();
         loadDictionary();
 
     </script>
