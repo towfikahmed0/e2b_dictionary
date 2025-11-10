@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2B Web Dictionary</title>
+    <link rel="icon" type="image/png" href="./img/logo.png">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#4da6ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="E2B Dictionary">
+    <link rel="apple-touch-icon" href="./img/logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.25s ease-in-out;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --primary-color: #4da6ff;
+            --secondary-color: #e6f2ff;
+            --accent-color: #0077cc;
+            --text-color: #333;
+            --light-text: #666;
+            --white: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+        }
+
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #f2f2f2;
+        }
+
+        body.dark-mode .hero {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+        }
+
+        body.dark-mode .about {
+            background-color: #2a2a2a;
+        }
+
+        body.dark-mode .about-card {
+            background-color: #333;
+            color: #f2f2f2;
+        }
+
+        body.dark-mode .summary-card {
+            background-color: #333;
+            color: #f2f2f2;
+        }
+
+        body.dark-mode .search_txt {
+            background-color: #333;
+            color: #fff;
+        }
+
+        body.dark-mode #suggestions-container {
+            background-color: #333;
+            border-color: #555;
+        }
+
+        body.dark-mode .suggestion-item {
+            border-color: #555;
+            color: #f2f2f2;
+        }
+
+        body.dark-mode .suggestion-item:hover {
+            background-color: #444;
+        }
+
+        body.dark-mode .suggestion-word {
+            color: #4da6ff;
+        }
+
+        body.dark-mode .suggestion-bangla {
+            color: #8cb3d9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: var(--accent-color);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        body.dark-mode header {
+            background-color: rgba(42, 42, 42, 0.8);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: var(--white);
+            text-align: center;
+            padding: 150px 0 100px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #1565c0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin: 12px auto 5px;
+            color: #1e88e5;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 800px;
+            margin: 30px auto;
+        }
+
+        .search_txt {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            outline: none;
+            backdrop-filter: blur(5px);
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search_txt:focus {
+            box-shadow: 0 0 10px rgba(77, 166, 255, 0.5);
+        }
+
+        .about {
+            background-color: var(--secondary-color);
+        }
+
+        .about-section {
+            padding: 60px 0;
+        }
+
+        .lead {
+            color: var(--text-color);
+            margin-bottom: 24px;
+            max-width: 700px;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .about-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .about-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .about-card ul {
+            list-style: disc;
+            margin-left: 18px;
+        }
+
+        .about-cta {
+            margin-top: 20px;
+        }
+
+        .dictionary_info {
+            padding: 80px 0;
+        }
+
+        .dictionary_info h2 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 40px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            border-radius: 10px;
+            text-align: center;
+            padding: 25px 10px;
+            transition: transform 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .summary-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .summary-card p {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        #suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #fefcf7;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            border: 1px solid #d4c8b5;
+            border-top: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            text-align: left;
+            cursor: pointer;
+            border-bottom: 1px solid #e8dfd1;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .suggestion-item:hover {
+            background-color: #e8dfd1;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-word {
+            font-weight: 600;
+            color: #4a371b;
+            font-size: 1.1rem;
+        }
+
+        .suggestion-bangla {
+            font-style: italic;
+            color: #6b5a3c;
+            font-size: 0.9rem;
+        }
+
+        .word-details {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        body.dark-mode .word-details {
+            background-color: #333;
+        }
+
+        .word-details h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        .word-details h3 {
+            color: var(--accent-color);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .word-details p {
+            margin-bottom: 10px;
+        }
+
+        .synonym-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .synonym {
+            background-color: var(--secondary-color);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .synonym {
+            background-color: #444;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: var(--light-text);
+        }
+
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: #e74c3c;
+            background-color: #ffeaea;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        body.dark-mode .error {
+            background-color: #4a1f1f;
+        }
+
+        @media (max-width: 768px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                display: none;
+                margin-top: 20px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                margin: 10px 0;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+
+            .about-content {
+                flex-direction: column;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a;
+                color: #f2f2f2;
+            }
+
+            header {
+                background-color: #2a2a2a;
+            }
+
+            .hero {
+                background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            }
+
+            .search_txt {
+                background-color: #333;
+                color: #fff;
+            }
+
+            .feature-card {
+                background-color: #2b2b2b;
+                color: #f2f2f2;
+            }
+
+            a {
+                color: #66b2ff;
+            }
+
+            a:hover {
+                color: #4da6ff;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div style="display: flex; align-items: center;">
+                    <img src="./img/logo.png" alt="logo" width="30px" height="30px" style="margin-right: 10px;">
+                    <div class="logo">E2B Web Dictionary</div>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><button id="darkToggle" class="btn">Dark Mode</button></li>
+                </ul>
+                <div class="menu-toggle"><i class="fas fa-bars"></i></div>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="container">
+            <h1>Welcome to the E2B Web Dictionary</h1>
+            <div class="search-container">
+                <input type="text" class="search_txt" placeholder="Search for a word..." id="search_txt">
+                <div id="suggestions-container"></div>
+            </div>
+            <p class="subtitle">Find definitions, synonyms, and Bangla meanings in one simple search.</p>
+        </div>
+    </section>
+
+    <div id="word_details" class="word-details"></div>
+
+    <section id="dictionary_info" class="dictionary_info">
+        <div class="container">
+            <h2>E2B Dictionary Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Total Words</h3>
+                    <p><span id="word_count">0</span></p>
+                </div>
+                <div class="summary-card">
+                    <h3>Synonyms Available</h3>
+                    <p><span id="synonym_count">0</span></p>
+                </div>
+                <div class="summary-card">
+                    <h3>Bangla Translations</h3>
+                    <p><span id="translation_count">0</span></p>
+                </div>
+                <div class="summary-card">
+                    <h3>Last Updated</h3>
+                    <p><span id="last_updated">November 10, 2025</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-header">
+                <h1>About E2B Dictionary</h1>
+                <p class="lead">E2B Dictionary is a Python-genarated English → Bangla dictionary that automatically
+                    finds
+                    meanings, synonyms, and Bengali translations to make learning new words simple and enjoyable.</p>
+            </div>
+            <div class="about-grid">
+                <article class="about-card">
+                    <h3>How it works</h3>
+                    <p>The primary dictionary is generated by a Python program that extracts words from the provided
+                        article URL. It retrieves the meanings, definitions, synonyms, and antonyms from online sources
+                        and saves them to the dictionary file. The web application then retrieves this data and presents
+                        it through a user-friendly interface.
+                    </p>
+                </article>
+                <article class="about-card">
+                    <h3>Main features</h3>
+                    <ul>
+                        <li>Fast word search with clear definitions</li>
+                        <li>Synonyms and related words</li>
+                        <li>Bangla translations for Bengali learners</li>
+                        <li>Responsive, mobile-friendly design</li>
+                        <li>Lightweight and customizable</li>
+                    </ul>
+                </article>
+                <article class="about-card">
+                    <h3>Tech stack</h3>
+                    <p><strong>Dictionary build with:</strong> Python<br><strong>Frontend:</strong> HTML, CSS,
+                        JavaScript<br><strong>Data:</strong> JSON or third-party dictionary APIs</p>
+                </article>
+                <article class="about-card">
+                    <h3>Project goals</h3>
+                    <p>To make English learning easier for Bengali speakers by providing fast, accurate definitions and
+                        translations. E2B aims to be a helpful tool for students and learners alike.</p>
+                </article>
+            </div>
+            <article class="about-card" style="width: 100%; margin-top: 20px;">
+                <h3>Contributor</h3>
+                <p>Developed by <a href="https://towfikahmed0.github.io/">Towfik Ahmed</a></p>
+
+            </article>
+            <footer class="about-cta">
+                <p>Want to contribute or test a developer preview? <a
+                        href="https://github.com/towfikahmed0/e2b_dictionary">Get in touch</a>.</p>
+            </footer>
+        </div>
+    </section>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function (registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(function (error) {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+    <script>
+        const dictionaryUrl = 'https://raw.githubusercontent.com/towfikahmed0/e2b_dictionary/main/dictionary.json';
+        const searchInput = document.getElementById('search_txt');
+        const suggestionsContainer = document.getElementById('suggestions-container');
+        const wordDetails = document.getElementById('word_details');
+        let dictionaryData = [];
+        let isDarkMode = false;
+
+        // Load dictionary data
+        async function loadDictionary() {
+            try {
+                showLoading();
+                const response = await fetch(dictionaryUrl);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch dictionary data');
+                }
+                dictionaryData = await response.json();
+                updateWordCount();
+                hideLoading();
+            } catch (err) {
+                console.error('Failed to load dictionary:', err);
+                showError('Failed to load dictionary data. Please try again later.');
+            }
+        }
+
+        function showLoading() {
+            const loadingEl = document.createElement('div');
+            loadingEl.className = 'loading';
+            loadingEl.id = 'loading-indicator';
+            loadingEl.textContent = 'Loading dictionary data...';
+            document.getElementById('dictionary_info').appendChild(loadingEl);
+        }
+
+        function hideLoading() {
+            const loadingEl = document.getElementById('loading-indicator');
+            if (loadingEl) {
+                loadingEl.remove();
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.createElement('div');
+            errorEl.className = 'error';
+            errorEl.textContent = message;
+            document.getElementById('dictionary_info').appendChild(errorEl);
+        }
+
+        function updateWordCount() {
+            const count = dictionaryData.length;
+            document.getElementById('word_count').textContent = count.toLocaleString();
+            let synonymCount = 0;
+            dictionaryData.forEach(w => {
+                if (w.syn && w.syn.length > 0) {
+                    synonymCount = synonymCount + w.syn.length;
+                }
+            });
+            document.getElementById('synonym_count').textContent = synonymCount.toLocaleString();
+            let bnCount = 0;
+            dictionaryData.forEach(w => {
+                if (w.bn && w.bn.length > 0) {
+                    bnCount = bnCount + w.bn.length;
+                }
+            });
+            document.getElementById('translation_count').textContent = bnCount.toLocaleString();
+        }
+
+        function filterSuggestions() {
+            const query = searchInput.value.toLowerCase().trim();
+            if (!query) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            const suggestions = dictionaryData
+                .filter(w => w.en.toLowerCase().startsWith(query))
+                .slice(0, 10);
+            displaySuggestions(suggestions);
+        }
+
+        function displaySuggestions(list) {
+            suggestionsContainer.innerHTML = '';
+            if (!list.length) {
+                suggestionsContainer.innerHTML = '<div class="suggestion-item">No words found</div>';
+            } else {
+                list.forEach(w => {
+                    const el = document.createElement('div');
+                    el.className = 'suggestion-item';
+                    el.innerHTML = `
+                        <span class='suggestion-word'>${w.en}</span>
+                        <span class='suggestion-bangla'>${w.bn?.[0] || ''}</span>
+                    `;
+                    el.addEventListener('click', () => displayWordDetails(w));
+                    suggestionsContainer.appendChild(el);
+                });
+            }
+            suggestionsContainer.style.display = 'block';
+        }
+
+        async function displayWordDetails(word) {
+
+            // ask api to fetch more details about the word if needed
+            try {
+                const response = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word.en);
+                const data = await response.json();
+                const wordData = data[0];
+
+                let phonetics = wordData.phonetics?.map(p => p.text).filter(Boolean).join(", ") || "Not available";
+                let pos = wordData.meanings?.map(m => m.partOfSpeech).filter(Boolean).join(", ") || "Not available";
+                //make pos an array of unique values
+                pos = [...new Set(wordData.meanings?.map(m => m.partOfSpeech).filter(Boolean))].join(", ") || "Not available";
+                // convert pos an array
+                pos = wordData.meanings?.map(m => m.partOfSpeech).filter(Boolean) || [];
+
+                let audioUrl = wordData.phonetics?.find(p => p.audio)?.audio || null;
+
+                let examples = [];
+                wordData.meanings?.forEach(m => {
+                    m.definitions?.forEach(d => {
+                        if (d.example) {
+                            examples.push(d.example);
+                        }
+                    });
+                });
+                if (examples.length > 0) {
+                    word.sen = examples;
+                }
+
+
+
+                wordDetails.innerHTML = `
+     <h1 style="font-style: italic;" onclick="pronounce('${audioUrl}')">${word.en}</h1>
+     <p>${phonetics}</p>
+     <div class="synonym-list">${pos.map(p => `<span class="synonym">${p}</span>`).join('') || ""}</div>
+     <h3>Bangla Meaning</h3>
+     <p>${word.bn?.join(', ') || 'No translation available'}</p>
+     <h3>Definition</h3>
+     <ul style="list-style: disc; margin-left: 20px;">
+         ${word.def ? word.def.map(d => `<li>${d}</li>`).join('') : '<li>No definition available</li>'}
+     </ul>
+     ${word.syn ? `
+         <h3>Synonyms</h3>
+         <div class="synonym-list">
+             ${word.syn.map(s => `<span class="synonym">${s}</span>`).join('') || "No synonyms available"}
+         </div>
+     ` : ''}
+     ${word.ant ? `
+         <h3>Antonyms</h3>
+         <div class="synonym-list">
+             ${word.ant.map(a => `<span class="synonym">${a}</span>`).join('') || "No antonyms available"}
+         </div>
+     ` : ''}
+     ${word.sen ? `
+         <h3>Example Sentences</h3>
+         <ul style="
+    margin-left: 20px;
+">
+             ${word.sen.map(s => `<li>${s}</li>`).join('')}
+         </ul>
+     ` : ''}`;
+                wordDetails.style.display = 'block';
+                suggestionsContainer.style.display = 'none';
+                searchInput.value = word.en;
+                wordDetails.scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                console.error('Failed to fetch additional word details:', err);
+            }
+
+        }
+
+        function pronounce(audioUrl) {
+
+            if (audioUrl) {
+                const audio = new Audio(audioUrl);
+                audio.play();
+            } else {
+                alert('Pronunciation audio not available.');
+            }
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            document.getElementById('darkToggle').textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
+
+            // Save preference to localStorage
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        function initializeDarkMode() {
+            const savedMode = localStorage.getItem('darkMode');
+            if (savedMode !== null) {
+                isDarkMode = JSON.parse(savedMode);
+                document.body.classList.toggle('dark-mode', isDarkMode);
+                document.getElementById('darkToggle').textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                // If no saved preference, use system preference
+                isDarkMode = true;
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkToggle').textContent = 'Light Mode';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('darkToggle').addEventListener('click', toggleDarkMode);
+        document.querySelector('.menu-toggle').addEventListener('click', () => {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+        searchInput.addEventListener('input', filterSuggestions);
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+
+        // Initialize the application
+        initializeDarkMode();
+        loadDictionary();
+
+    </script>
+</body>
+
+</html>
