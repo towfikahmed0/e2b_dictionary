@@ -14,396 +14,555 @@
     <link rel="apple-touch-icon" href="./img/logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-       * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    transition: all 0.25s ease-in-out;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.25s ease-in-out;
+        }
 
-html {
-    scroll-behavior: smooth;
-}
+        html {
+            scroll-behavior: smooth;
+        }
 
-:root {
-    --primary-color: #4da6ff;
-    --secondary-color: #e6f2ff;
-    --accent-color: #0077cc;
-    --text-color: #333;
-    --light-text: #666;
-    --white: #fff;
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+        :root {
+            --primary-color: #4da6ff;
+            --secondary-color: #e6f2ff;
+            --accent-color: #0077cc;
+            --text-color: #333;
+            --light-text: #666;
+            --white: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-/* FORCE LIGHT MODE */
-body {
-    background-color: #f9f9f9 !important;
-    color: #333 !important;
-}
+        body {
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+        }
 
-body.dark-mode {
-    background-color: #f9f9f9 !important;
-    color: #333 !important;
-}
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #f2f2f2;
+        }
 
-header {
-    background-color: rgba(255, 255, 255, 0.8) !important;
-    box-shadow: var(--shadow);
-}
+        body.dark-mode .hero {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+        }
 
-.search_txt {
-    background-color: rgba(255, 255, 255, 0.6) !important;
-    color: #333 !important;
-}
+        body.dark-mode .about {
+            background-color: #2a2a2a;
+        }
 
-/* GENERAL STYLES */
-body {
-    line-height: 1.6;
-}
+        body.dark-mode .about-card {
+            background-color: #333;
+            color: #f2f2f2;
+        }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
+        body.dark-mode .summary-card {
+            background-color: #333;
+            color: #f2f2f2;
+        }
 
-section {
-    padding: 80px 0;
-}
+        body.dark-mode .search_txt {
+            background-color: #333;
+            color: #fff;
+        }
 
-h1, h2, h3 {
-    margin-bottom: 20px;
-    color: var(--accent-color);
-}
+        body.dark-mode #suggestions-container {
+            background-color: #333;
+            border-color: #555;
+        }
 
-p {
-    margin-bottom: 15px;
-}
+        body.dark-mode .suggestion-item {
+            border-color: #555;
+            color: #f2f2f2;
+        }
 
-a {
-    text-decoration: none;
-    color: var(--primary-color);
-    transition: color 0.3s;
-}
+        body.dark-mode .suggestion-item:hover {
+            background-color: #444;
+        }
 
-a:hover {
-    color: var(--accent-color);
-}
+        body.dark-mode .suggestion-word {
+            color: #4da6ff;
+        }
 
-.btn {
-    display: inline-block;
-    background-color: var(--primary-color);
-    color: var(--white);
-    padding: 10px 25px;
-    border-radius: 5px;
-    font-weight: 600;
-    transition: background-color 0.3s, transform 0.3s;
-    border: none;
-    cursor: pointer;
-}
+        body.dark-mode .suggestion-bangla {
+            color: #8cb3d9;
+        }
 
-.btn:hover {
-    background-color: var(--accent-color);
-    transform: translateY(-3px);
-}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-.btn-secondary {
-    background-color: #6c757d;
-}
+        section {
+            padding: 80px 0;
+        }
 
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
+        h1,
+        h2,
+        h3 {
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
 
-/* HEADER / NAV */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 0;
-}
+        p {
+            margin-bottom: 15px;
+        }
 
-.logo {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--primary-color);
-}
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: color 0.3s;
+        }
 
-.nav-links {
-    display: flex;
-    list-style: none;
-    align-items: center;
-}
+        a:hover {
+            color: var(--accent-color);
+        }
 
-.nav-links li {
-    margin-left: 30px;
-}
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.3s;
+            border: none;
+            cursor: pointer;
+        }
 
-.nav-links a {
-    color: var(--text-color);
-    font-weight: 500;
-}
+        .btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
 
-.nav-links a:hover {
-    color: var(--primary-color);
-}
+        .btn-secondary {
+            background-color: #6c757d;
+        }
 
-.menu-toggle {
-    display: none;
-    font-size: 24px;
-    cursor: pointer;
-}
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
 
-/* HERO */
-.hero {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    color: var(--white);
-    text-align: center;
-    padding: 110px 0 100px;
-}
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
 
-.hero h1 {
-    font-size: 48px;
-    margin-bottom: 20px;
-    color: #1565c0;
-    animation: float 3s ease-in-out infinite;
-}
+        body.dark-mode header {
+            background-color: rgba(42, 42, 42, 0.8);
+        }
 
-.hero p {
-    font-size: 20px;
-    margin: 12px auto 5px;
-    color: #1e88e5;
-}
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-}
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
 
-/* SEARCH */
-.search-container {
-    position: relative;
-    max-width: 800px;
-    margin: 30px auto;
-}
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
 
-.search_txt {
-    width: 100%;
-    padding: 15px 20px;
-    font-size: 18px;
-    border: none;
-    border-radius: 30px;
-    box-shadow: var(--shadow);
-    outline: none;
-    backdrop-filter: blur(5px);
-}
+        .nav-links li {
+            margin-left: 30px;
+        }
 
-.search_txt:focus {
-    box-shadow: 0 0 10px rgba(77, 166, 255, 0.5);
-}
+        .nav-links a {
+            color: var(--text-color);
+            font-weight: 500;
+        }
 
-#suggestions-container {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: #fefcf7;
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 100;
-    display: none;
-    border: 1px solid #d4c8b5;
-    border-top: none;
-}
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
 
-.suggestion-item {
-    padding: 12px 20px;
-    text-align: left;
-    cursor: pointer;
-    border-bottom: 1px solid #e8dfd1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
 
-.suggestion-item:hover {
-    background-color: #e8dfd1;
-}
+        .hero {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: var(--white);
+            text-align: center;
+            padding: 150px 0 100px;
+        }
 
-.suggestion-word {
-    font-weight: 600;
-    color: #4a371b;
-    font-size: 1.1rem;
-}
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #1565c0;
+            animation: float 3s ease-in-out infinite;
+        }
 
-.suggestion-bangla {
-    font-style: italic;
-    color: #6b5a3c;
-    font-size: 0.9rem;
-}
+        .hero p {
+            font-size: 20px;
+            margin: 12px auto 5px;
+            color: #1e88e5;
+        }
 
-/* WORD DETAILS */
-.word-details {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: var(--white);
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    display: none;
-}
+        .search-container {
+            position: relative;
+            max-width: 800px;
+            margin: 30px auto;
+        }
 
-.word-details h2, .word-details h3 {
-    color: var(--accent-color);
-    margin-bottom: 15px;
-}
+        .search_txt {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            outline: none;
+            backdrop-filter: blur(5px);
+            background-color: rgba(255, 255, 255, 0.6);
+        }
 
-.synonym-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
-}
+        .search_txt:focus {
+            box-shadow: 0 0 10px rgba(77, 166, 255, 0.5);
+        }
 
-.synonym {
-    background-color: var(--secondary-color);
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.9rem;
-}
+        .about {
+            background-color: var(--secondary-color);
+        }
 
-/* ABOUT SECTION */
-.about {
-    background-color: var(--secondary-color);
-}
+        .about-section {
+            padding: 60px 0;
+        }
 
-.about-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
+        .lead {
+            color: var(--text-color);
+            margin-bottom: 24px;
+            max-width: 700px;
+        }
 
-.about-card {
-    background: var(--white);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-}
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
 
-.about-card h3 {
-    margin-bottom: 10px;
-}
+        .about-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
 
-.about-card ul {
-    list-style: disc;
-    margin-left: 18px;
-}
+        .about-card h3 {
+            margin-bottom: 10px;
+        }
 
-.about-cta {
-    margin-top: 20px;
-}
+        .about-card ul {
+            list-style: disc;
+            margin-left: 18px;
+        }
 
-/* DICTIONARY SUMMARY */
-.summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
+        .about-cta {
+            margin-top: 20px;
+        }
 
-.summary-card {
-    background-color: var(--white);
-    box-shadow: var(--shadow);
-    border-radius: 10px;
-    text-align: center;
-    padding: 25px 10px;
-    transition: transform 0.3s;
-}
+        .dictionary_info {
+            padding: 80px 0;
+        }
 
-.summary-card:hover {
-    transform: translateY(-5px);
-}
+        .dictionary_info h2 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 40px;
+        }
 
-.summary-card h3 {
-    color: var(--primary-color);
-    margin-bottom: 8px;
-}
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
 
-.summary-card p {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--text-color);
-}
+        .summary-card {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            border-radius: 10px;
+            text-align: center;
+            padding: 25px 10px;
+            transition: transform 0.3s;
+        }
 
-/* LOADING & ERROR */
-.loading {
-    text-align: center;
-    padding: 20px;
-    font-style: italic;
-    color: var(--light-text);
-}
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
 
-.error {
-    text-align: center;
-    padding: 20px;
-    color: #e74c3c;
-    background-color: #ffeaea;
-    border-radius: 5px;
-    margin: 20px 0;
-}
+        .summary-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .about-grid {
-        grid-template-columns: 1fr;
-    }
+        .summary-card p {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
 
-    .summary-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+        #suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #fefcf7;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            border: 1px solid #d4c8b5;
+            border-top: none;
+        }
 
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+        .suggestion-item {
+            padding: 12px 20px;
+            text-align: left;
+            cursor: pointer;
+            border-bottom: 1px solid #e8dfd1;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .nav-links {
-        flex-direction: column;
-        width: 100%;
-        display: none;
-        margin-top: 20px;
-    }
+        .suggestion-item:hover {
+            background-color: #e8dfd1;
+        }
 
-    .nav-links.active {
-        display: flex;
-    }
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
 
-    .nav-links li {
-        margin: 10px 0;
-    }
+        .suggestion-word {
+            font-weight: 600;
+            color: #4a371b;
+            font-size: 1.1rem;
+        }
 
-    .menu-toggle {
-        display: block;
-        position: absolute;
-        top: 20px;
-        right: 20px;
-    }
+        .suggestion-bangla {
+            font-style: italic;
+            color: #6b5a3c;
+            font-size: 0.9rem;
+        }
 
-    .hero h1 {
-        font-size: 36px;
-    }
+        .word-details {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
 
-    .hero p {
-        font-size: 18px;
-    }
+        body.dark-mode .word-details {
+            background-color: #333;
+        }
 
-    .summary-grid {
-        grid-template-columns: 1fr;
-    }
-}
+        .word-details h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        .word-details h3 {
+            color: var(--accent-color);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .word-details p {
+            margin-bottom: 10px;
+        }
+
+        .synonym-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .synonym {
+            background-color: var(--secondary-color);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .synonym {
+            background-color: #444;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: var(--light-text);
+        }
+
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: #e74c3c;
+            background-color: #ffeaea;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        body.dark-mode .error {
+            background-color: #4a1f1f;
+        }
+
+        #installBtn {
+            display: none;
+        }
+
+        .dictionary_img {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: flex-start;
+            margin-top: 5px;
+        }
+
+        .dictionary_img img {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-top: 10px;
+            width: 45%;
+        }
+
+        @media (max-width: 768px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                display: none;
+                margin-top: 20px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                margin: 10px 0;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+
+            .about-content {
+                flex-direction: column;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dictionary_img img {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a;
+                color: #f2f2f2;
+            }
+
+            header {
+                background-color: #2a2a2a;
+            }
+
+            .hero {
+                background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            }
+
+            .search_txt {
+                background-color: #333;
+                color: #fff;
+            }
+
+            .feature-card {
+                background-color: #2b2b2b;
+                color: #f2f2f2;
+            }
+
+            a {
+                color: #66b2ff;
+            }
+
+            a:hover {
+                color: #4da6ff;
+            }
+        }
     </style>
 </head>
 
@@ -412,7 +571,7 @@ a:hover {
         <div class="container">
             <nav class="navbar">
                 <div style="display: flex; align-items: center;">
-                    <img src="./img/logo.png" alt="logo" width="50px" height="50px" style="margin-right: 10px;">
+                    <img src="./img/logo.png" alt="logo" width="30px" height="30px" style="margin-right: 10px;">
                     <div class="logo">E2B Web Dictionary</div>
                 </div>
                 <ul class="nav-links">
@@ -548,20 +707,20 @@ a:hover {
 
         installBtn.addEventListener('click', async () => {
             if (!deferredPrompt) return;
-            
+
             // Show the install prompt
             deferredPrompt.prompt();
-            
+
             // Wait for the user to respond to the prompt
             const { outcome } = await deferredPrompt.userChoice;
-            
+
             if (outcome === 'accepted') {
                 console.log('User accepted the install prompt');
                 installBtn.style.display = 'none';
             } else {
                 console.log('User dismissed the install prompt');
             }
-            
+
             // Clear the saved prompt since it can't be used again
             deferredPrompt = null;
         });
@@ -693,7 +852,8 @@ a:hover {
                     word.sen = examples;
                 }
 
-
+                let dictionary_img = `https://www.english-bangla.com/public/images/words/D${word.en[0]}/${word.en}`;
+                //https://www.english-bangla.com/public/images/words/D{first letter of the word}/{word}
 
                 wordDetails.innerHTML = `
      <h1 style="font-style: italic;" onclick="pronounce('${audioUrl}')">${word.en}</h1>
@@ -715,16 +875,18 @@ a:hover {
          <h3>Antonyms</h3>
          <div class="synonym-list">
              ${word.ant.map(a => `<span class="synonym">${a}</span>`).join('') || "No antonyms available"}
-         </div>
-     ` : ''}
+         </div>` : ''}
      ${word.sen ? `
          <h3>Example Sentences</h3>
-         <ul style="
-    margin-left: 20px;
-">
-             ${word.sen.map(s => `<li>${s}</li>`).join('')}
+         <ul style="margin-left: 20px;">
+            ${word.sen.map(s => `<li>${s}</li>`).join('')}
          </ul>
-     ` : ''}`;
+     ` : ''}
+    <h3>From Dictionary</h3>
+    <div class="dictionary_img">
+    <img src="${dictionary_img}" alt="Dictionary Image" onerror="this.onerror=null;this.outerHTML='<span>Not available for this word</span>';">
+     </div>
+     `;
                 wordDetails.style.display = 'block';
                 suggestionsContainer.style.display = 'none';
                 searchInput.value = word.en;
