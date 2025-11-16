@@ -14,8 +14,9 @@ import time
 init(autoreset=True)
 
 DICT_PATH = "dictionary.json"
-GITHUB_DICT_URL = "https://raw.githubusercontent.com/towfikahmed0/Bornopath/refs/heads/main/dictionary.json"
+GITHUB_DICT_URL = "https://raw.githubusercontent.com/towfikahmed0/e2b_dictionary/refs/heads/main/dictionary.json"
 MAX_WORKERS = 10
+RESTRICTED_WORDS_PATH = "restricted_words.txt"
 
 COMMON_WORDS = {
     'a', 'an', 'and', 'any', 'are', 'as', 'at', 'be', 'been', 'being', 'both',
@@ -40,6 +41,124 @@ def title(msg): print(Style.BRIGHT + Fore.MAGENTA + msg)
 
 
 # =======================
+# ENHANCED RESTRICTED WORDS MANAGEMENT
+# =======================
+def load_restricted_word_list(path):
+    """Load restricted words with better error handling and deduplication"""
+    restricted_words = []
+    try:
+        if not os.path.exists(path):
+            # Create file with header comment
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("# Restricted words list - words that couldn't be translated\n")
+                f.write("# This file is automatically maintained by the program\n\n")
+            info(f"> Created missing restricted words file: {path}")
+        else:
+            with open(path, "r", encoding="utf-8") as rf:
+                for line in rf:
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+                    restricted_words.append(line.lower())
+
+        # Enhanced deduplication while preserving order
+        seen = set()
+        cleaned = []
+        for w in restricted_words:
+            if w not in seen:
+                seen.add(w)
+                cleaned.append(w)
+        restricted_words = cleaned
+
+        info(f"> Loaded {len(restricted_words)} restricted words from {path}")
+    except Exception as e:
+        warn(f"! Could not load restricted words from {path}: {e}")
+        restricted_words = []
+    return restricted_words
+
+def save_to_restricted_words(word, path=RESTRICTED_WORDS_PATH):
+    """
+    Enhanced function to save words to restricted list
+    - Automatically deduplicates
+    - Maintains file structure
+    - Provides feedback
+    """
+    try:
+        word_lower = word.lower().strip()
+        if not word_lower or len(word_lower) < 2:
+            return False
+            
+        # Load current restricted words to check for duplicates
+        current_restricted = set()
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as rf:
+                for line in rf:
+                    line = line.strip()
+                    if line and not line.startswith("#"):
+                        current_restricted.add(line.lower())
+        
+        # Check if word already exists
+        if word_lower in current_restricted:
+            return False  # Word already in restricted list
+            
+        # Append the new word
+        with open(path, "a", encoding="utf-8") as rf:
+            rf.write(word_lower + "\n")
+        
+        warn(f"  → Added '{word_lower}' to restricted words list (no Bangla translation found)")
+        return True
+        
+    except Exception as e:
+        warn(f"! Could not save restricted word '{word}': {e}")
+        return False
+
+def bulk_save_to_restricted_words(words, path=RESTRICTED_WORDS_PATH):
+    """
+    Save multiple words to restricted list efficiently
+    - Deduplicates against existing content
+    - Saves in batch
+    """
+    if not words:
+        return 0
+        
+    try:
+        words_lower = [word.lower().strip() for word in words if word and len(word.strip()) >= 2]
+        if not words_lower:
+            return 0
+            
+        # Load current restricted words
+        current_restricted = set()
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as rf:
+                for line in rf:
+                    line = line.strip()
+                    if line and not line.startswith("#"):
+                        current_restricted.add(line.lower())
+        
+        # Find new words to add
+        new_words = []
+        for word in words_lower:
+            if word not in current_restricted:
+                new_words.append(word)
+                current_restricted.add(word)  # Add to set to avoid duplicates in this batch
+        
+        if not new_words:
+            return 0
+            
+        # Append all new words
+        with open(path, "a", encoding="utf-8") as rf:
+            for word in new_words:
+                rf.write(word + "\n")
+        
+        warn(f"  → Added {len(new_words)} words to restricted list: {', '.join(new_words[:5])}{'...' if len(new_words) > 5 else ''}")
+        return len(new_words)
+        
+    except Exception as e:
+        warn(f"! Could not bulk save restricted words: {e}")
+        return 0
+
+
+# =======================
 # SESSION / DICTIONARY IO
 # =======================
 def create_session():
@@ -55,7 +174,6 @@ def create_session():
         "Connection": "keep-alive",
     })
     return session
-
 
 def load_dictionary(session=None):
     if os.path.exists(DICT_PATH):
@@ -179,12 +297,11 @@ def generate_candidates(word):
     return candidates
 
 
-def filter_words(word_list, existing_words_set):
-
+def filter_words(word_list, existing_words_set, restricted_words):
     out = set()
     for raw in word_list:
         w = raw.lower()
-        if 3 < len(w) < 15 and w.isalpha() and w not in COMMON_WORDS and w not in existing_words_set:
+        if 3 < len(w) < 15 and w.isalpha() and w not in COMMON_WORDS and w not in existing_words_set and w not in restricted_words:
             out.add(w)
     out_list = sorted(out)
     success(f"* Filtered down to {len(out_list)} candidate words after applying criteria.")
@@ -192,11 +309,12 @@ def filter_words(word_list, existing_words_set):
 
 
 # =======================
-# FETCH BANGLA MEANINGS (THREAD-SAFE)
+# ENHANCED BANGLA MEANINGS FETCHING WITH AUTOMATIC RESTRICTED WORDS SAVING
 # =======================
 def get_word_bn(session, word_list):
     info(f"> Fetching Bangla meanings for {len(word_list)} words...")
     return_json = []
+    failed_words = []  # Track words without Bangla translations
 
     def is_english_only(text):
         return bool(re.match(r'^[A-Za-z\s]+$', text))
@@ -208,25 +326,45 @@ def get_word_bn(session, word_list):
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             bn_spans = soup.find_all("span", class_="format1")
+            
             bn_list = []
             for span in bn_spans:
                 text = span.get_text(separator=' ', strip=True)
                 parts = re.split(r'[;,/]|(?:\s+or\s+)|(?:\s+and\s+)', text)
                 for p in parts:
                     p = p.strip()
-                    if p and not is_english_only(p) and len(p) <= 30:
+                    if p and not is_english_only(p) and len(p) <= 25 and p.count(' ') < 3:
                         bn_list.append(p)
+            
+            # secondary fallback to "meaning" class if format1 yields nothing
+            if len(bn_list) == 0:
+                
+                bn_spans = soup.find_all("span", class_="meaning")
+                if bn_spans:
+                    s1 = str(bn_spans[0])
+                    s2 = re.sub(r"<.*?>", "", s1)
+                    bn_list = re.findall(r'[ঀ-৿]+', s2)
+                
+            
             # fallback to single format1 if nothing captured
             if not bn_list and bn_spans:
                 text = bn_spans[0].get_text(strip=True)
                 if text and not is_english_only(text):
                     bn_list = [text]
+                    
             bn_list = list(dict.fromkeys(bn_list))[:5]
             if bn_list:
                 return {'en': word, 'bn': bn_list}
+            else:
+                # No meanings found - add to failed words list
+                # warn(f"  - No Bangla meanings found for '{word}'.")
+                failed_words.append(word)
+                return None
+                
         except Exception as e:
+            warn(f"  - Error processing '{word}': {e}")
+            failed_words.append(word)
             return None
-        return None
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = [executor.submit(process_bn_word, w) for w in word_list]
@@ -234,6 +372,12 @@ def get_word_bn(session, word_list):
             res = future.result()
             if res:
                 return_json.append(res)
+
+    # Automatically save all failed words to restricted list
+    if failed_words:
+        saved_count = bulk_save_to_restricted_words(failed_words)
+        if saved_count > 0:
+            warn(f"  → Automatically saved {saved_count} words with no Bangla translations to restricted list")
 
     success(f"> {len(return_json)} words with Bangla meanings fetched successfully.")
     return return_json
@@ -305,7 +449,6 @@ def get_antonyms(session, word):
 
 
 def get_bengali_for_single_word(session, word):
-
     try:
         bn_data = get_word_bn(session, [word])
         if bn_data and bn_data[0].get('bn'):
@@ -316,10 +459,10 @@ def get_bengali_for_single_word(session, word):
 
 
 def get_word_dtl(session, json_with_bn, existing_words_set):
-
     info("* Fetching detailed meanings for words...")
     dtl_array = []
     lock_seen = set()
+    failed_detailed_words = []  # Track words that fail detailed processing
 
     def try_word_with_details(word_to_try):
         """Helper to get English details for a specific word"""
@@ -371,9 +514,11 @@ def get_word_dtl(session, json_with_bn, existing_words_set):
                 else:
                     # If no Bengali found for candidate, skip to avoid mismatches
                     warn(f"! No Bengali translation found for '{candidate}', skipping to avoid mismatch")
+                    failed_detailed_words.append(candidate)
                     return None
         
-        # No suitable candidate found
+        # No suitable candidate found - add to failed words
+        failed_detailed_words.append(original_word)
         return None
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
@@ -385,6 +530,12 @@ def get_word_dtl(session, json_with_bn, existing_words_set):
                 if en_lower not in lock_seen and en_lower not in existing_words_set:
                     lock_seen.add(en_lower)
                     dtl_array.append(result)
+
+    # Save words that failed detailed processing to restricted list
+    if failed_detailed_words:
+        saved_count = bulk_save_to_restricted_words(failed_detailed_words)
+        if saved_count > 0:
+            warn(f"  → Saved {saved_count} words with incomplete data to restricted list")
 
     success(f"> Detailed meanings fetched for {len(dtl_array)} words successfully.")
     return dtl_array
@@ -409,13 +560,14 @@ if __name__ == "__main__":
 
     session = create_session()
     existing_data, existing_words_set = load_dictionary(session)
+    restricted_words = load_restricted_word_list(RESTRICTED_WORDS_PATH)
 
     try:
         while True:
             url = ask_for_url()
             webpage = get_webpage(session, url)
             raw_words_list = fetch_words_from_webpage(webpage)
-            final_words_list = filter_words(raw_words_list, existing_words_set)
+            final_words_list = filter_words(raw_words_list, existing_words_set, restricted_words)
 
             if not final_words_list:
                 warn("No new candidate words after filtering. Try another URL or update the dictionary.")
