@@ -34,6 +34,10 @@
             --light-text: #666;
             --white: #fff;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
         }
 
         body {
@@ -127,17 +131,19 @@
             display: inline-block;
             background-color: var(--primary-color);
             color: var(--white);
-            padding: 10px 25px;
-            border-radius: 5px;
+            padding: 12px 28px;
+            border-radius: var(--border-radius-sm);
             font-weight: 600;
-            transition: background-color 0.3s, transform 0.3s;
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            box-shadow: var(--shadow);
         }
 
         .btn:hover {
             background-color: var(--accent-color);
             transform: translateY(-3px);
+            box-shadow: var(--hover-shadow);
         }
 
         .btn-secondary {
@@ -155,24 +161,32 @@
             width: 100%;
             z-index: 1000;
             backdrop-filter: blur(8px);
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
         }
 
         body.dark-mode header {
-            background-color: rgba(42, 42, 42, 0.8);
+            background-color: rgba(42, 42, 42, 0.9);
         }
 
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
+            padding: 15px 0;
         }
 
         .logo {
             font-size: 24px;
             font-weight: 700;
             color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            margin-right: 10px;
+            border-radius: 6px;
         }
 
         .nav-links {
@@ -186,18 +200,27 @@
         }
 
         .nav-links a {
-            color: var(--text-color);
+            
             font-weight: 500;
+            padding: 8px 12px;
+            border-radius: var(--border-radius-sm);
         }
 
         .nav-links a:hover {
             color: var(--primary-color);
+            background-color: rgba(77, 166, 255, 0.1);
         }
 
         .menu-toggle {
             display: none;
             font-size: 24px;
             cursor: pointer;
+            padding: 8px;
+            border-radius: var(--border-radius-sm);
+        }
+
+        .menu-toggle:hover {
+            background-color: rgba(77, 166, 255, 0.1);
         }
 
         .hero {
@@ -205,6 +228,19 @@
             color: var(--white);
             text-align: center;
             padding: 150px 0 100px;
+            position: relative;
+            
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%234da6ff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.5;
         }
 
         .hero h1 {
@@ -212,34 +248,39 @@
             margin-bottom: 20px;
             color: #1565c0;
             animation: float 3s ease-in-out infinite;
+            position: relative;
         }
 
         .hero p {
             font-size: 20px;
             margin: 12px auto 5px;
             color: #1e88e5;
+            position: relative;
         }
 
         .search-container {
             position: relative;
             max-width: 800px;
             margin: 30px auto;
+            z-index: 10;
         }
 
         .search_txt {
             width: 100%;
-            padding: 15px 20px;
+            padding: 18px 25px;
             font-size: 18px;
             border: none;
-            border-radius: 30px;
-            box-shadow: var(--shadow);
+            border-radius: 50px;
+            box-shadow: var(--card-shadow);
             outline: none;
             backdrop-filter: blur(5px);
-            background-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
         }
 
         .search_txt:focus {
-            box-shadow: 0 0 10px rgba(77, 166, 255, 0.5);
+            box-shadow: 0 0 15px rgba(77, 166, 255, 0.4);
+            transform: scale(1.02);
         }
 
         .about {
@@ -251,26 +292,39 @@
         }
 
         .lead {
-            color: var(--text-color);
             margin-bottom: 24px;
             max-width: 700px;
+            font-size: 1.1rem;
         }
 
         .about-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 25px;
         }
 
         .about-card {
             background: var(--white);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
         }
 
         .about-card h3 {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .about-card h3 i {
+            margin-right: 10px;
+            color: var(--primary-color);
         }
 
         .about-card ul {
@@ -290,37 +344,65 @@
             text-align: center;
             color: var(--accent-color);
             margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .dictionary_info h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
         }
 
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 30px;
         }
 
         .summary-card {
             background-color: var(--white);
-            box-shadow: var(--shadow);
-            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            border-radius: var(--border-radius);
             text-align: center;
-            padding: 25px 10px;
-            transition: transform 0.3s;
+            padding: 30px 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: var(--primary-color);
         }
 
         .summary-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: var(--hover-shadow);
         }
 
         .summary-card h3 {
             color: var(--primary-color);
             margin-bottom: 8px;
+            font-size: 1.1rem;
         }
 
         .summary-card p {
-            font-size: 20px;
+            font-size: 28px;
             font-weight: bold;
-            color: var(--text-color);
+            
         }
 
         #suggestions-container {
@@ -329,8 +411,8 @@
             left: 0;
             right: 0;
             background-color: #fefcf7;
-            border-radius: 0 0 4px 4px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            box-shadow: var(--card-shadow);
             max-height: 300px;
             overflow-y: auto;
             z-index: 100;
@@ -340,7 +422,7 @@
         }
 
         .suggestion-item {
-            padding: 12px 20px;
+            padding: 15px 25px;
             text-align: left;
             cursor: pointer;
             border-bottom: 1px solid #e8dfd1;
@@ -372,12 +454,14 @@
 
         .word-details {
             max-width: 800px;
-            margin: 40px auto;
-            padding: 30px;
+            margin: 100px auto 40px;
+            padding: 35px;
             background-color: var(--white);
-            border-radius: 10px;
-            box-shadow: var(--shadow);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
             display: none;
+            position: relative;
+	    scroll-margin-top: 80px;
         }
 
         body.dark-mode .word-details {
@@ -395,6 +479,12 @@
             color: var(--accent-color);
             margin-top: 20px;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .word-details h3 i {
+            margin-right: 10px;
         }
 
         .word-details p {
@@ -410,9 +500,16 @@
 
         .synonym {
             background-color: var(--secondary-color);
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
             font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .synonym:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
         }
 
         body.dark-mode .synonym {
@@ -458,6 +555,51 @@
             box-shadow: var(--shadow);
             margin-top: 10px;
             width: 45%;
+            transition: all 0.3s ease;
+        }
+
+        .dictionary_img img:hover {
+            transform: scale(1.02);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 8px;
+            border-radius: var(--border-radius-sm);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(77, 166, 255, 0.1);
+        }
+
+        body.dark-mode .theme-toggle {
+            color: #f2f2f2;
+        }
+
+        .word-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .word-header h1 {
+            margin-bottom: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .word-header h1 i {
+            margin-left: 10px;
+            font-size: 1.2rem;
+            color: var(--primary-color);
         }
 
         @media (max-width: 768px) {
@@ -506,7 +648,7 @@
             .menu-toggle {
                 display: block;
                 position: absolute;
-                top: 20px;
+                top: 15px;
                 right: 20px;
             }
 
@@ -570,13 +712,14 @@
     <header>
         <div class="container">
             <nav class="navbar">
-                <div style="display: flex; align-items: center;">
-                    <img src="./img/logo.png" alt="logo" width="30px" height="30px" style="margin-right: 10px;">
-                    <div class="logo">E2B Web Dictionary</div>
+                <div class="logo">
+                    <img src="./img/logo.png" alt="logo" width="30px" height="30px">
+                    <span>E2B Web Dictionary</span>
                 </div>
                 <ul class="nav-links">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#about">About</a></li>
+                    <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#about"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><button id="themeToggle" class="theme-toggle"><i class="fas fa-moon"></i></button></li>
                     <li><button id="installBtn" class="btn">Install App</button></li>
                 </ul>
                 <div class="menu-toggle"><i class="fas fa-bars"></i></div>
@@ -615,7 +758,7 @@
                 </div>
                 <div class="summary-card">
                     <h3>Last Updated</h3>
-                    <p><span id="last_updated">November 16, 2025</span></p>
+                    <p><span id="last_updated">November 18, 2025</span></p>
                 </div>
             </div>
         </div>
@@ -625,13 +768,13 @@
         <div class="container">
             <div class="about-header">
                 <h1>About E2B Dictionary</h1>
-                <p class="lead">E2B Dictionary is a Python-genarated English → Bangla dictionary that automatically
+                <p class="lead">E2B Dictionary is a Python-generated English → Bangla dictionary that automatically
                     finds
                     meanings, synonyms, and Bengali translations to make learning new words simple and enjoyable.</p>
             </div>
             <div class="about-grid">
                 <article class="about-card">
-                    <h3>How it works</h3>
+                    <h3><i class="fas fa-cogs"></i> How it works</h3>
                     <p>The primary dictionary is generated by a Python program that extracts words from the provided
                         article URL. It retrieves the meanings, definitions, synonyms, and antonyms from online sources
                         and saves them to the dictionary file. The web application then retrieves this data and presents
@@ -639,7 +782,7 @@
                     </p>
                 </article>
                 <article class="about-card">
-                    <h3>Main features</h3>
+                    <h3><i class="fas fa-star"></i> Main features</h3>
                     <ul>
                         <li>Fast word search with clear definitions</li>
                         <li>Synonyms and related words</li>
@@ -649,24 +792,24 @@
                     </ul>
                 </article>
                 <article class="about-card">
-                    <h3>Tech stack</h3>
+                    <h3><i class="fas fa-code"></i> Tech stack</h3>
                     <p><strong>Dictionary build with:</strong> Python<br><strong>Frontend:</strong> HTML, CSS,
                         JavaScript<br><strong>Data:</strong> JSON or third-party dictionary APIs</p>
                 </article>
                 <article class="about-card">
-                    <h3>Project goals</h3>
+                    <h3><i class="fas fa-bullseye"></i> Project goals</h3>
                     <p>To make English learning easier for Bengali speakers by providing fast, accurate definitions and
                         translations. E2B aims to be a helpful tool for students and learners alike.</p>
                 </article>
             </div>
             <article class="about-card" style="width: 100%; margin-top: 20px;">
-                <h3>Contributor</h3>
+                <h3><i class="fas fa-user"></i> Contributor</h3>
                 <p>Developed by <a href="https://towfikahmed0.github.io/">Towfik Ahmed</a></p>
-
             </article>
             <footer class="about-cta">
                 <p>Want to contribute or test a developer preview? <a
-                        href="https://github.com/towfikahmed0/e2b_dictionary">Get in touch</a>.</p>
+                        href="https://github.com/towfikahmed0/e2b_dictionary">Get in touch</a>. V1.2.0</p>
+                
             </footer>
         </div>
     </section>
@@ -692,8 +835,19 @@
         const suggestionsContainer = document.getElementById('suggestions-container');
         const wordDetails = document.getElementById('word_details');
         const installBtn = document.getElementById('installBtn');
+        const themeToggle = document.getElementById('themeToggle');
         let dictionaryData = [];
         let deferredPrompt;
+
+        // Theme toggle functionality
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
 
         // PWA Install Prompt
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -824,7 +978,6 @@
         }
 
         async function displayWordDetails(word) {
-
             // ask api to fetch more details about the word if needed
             try {
                 const response = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word.en);
@@ -856,37 +1009,39 @@
                 //https://www.english-bangla.com/public/images/words/D{first letter of the word}/{word}
 
                 wordDetails.innerHTML = `
-     <h1 style="font-style: italic;" onclick="pronounce('${audioUrl}')">${word.en}</h1>
-     <p>${phonetics}</p>
-     <div class="synonym-list">${pos.map(p => `<span class="synonym">${p}</span>`).join('') || ""}</div>
-     <h3>Bangla Meaning</h3>
-     <p>${word.bn?.join(', ') || 'No translation available'}</p>
-     <h3>Definition</h3>
-     <ul style="list-style: disc; margin-left: 20px;">
-         ${word.def ? word.def.map(d => `<li>${d}</li>`).join('') : '<li>No definition available</li>'}
-     </ul>
-     ${word.syn ? `
-         <h3>Synonyms</h3>
-         <div class="synonym-list">
-             ${word.syn.map(s => `<span class="synonym">${s}</span>`).join('') || "No synonyms available"}
-         </div>
-     ` : ''}
-     ${word.ant ? `
-         <h3>Antonyms</h3>
-         <div class="synonym-list">
-             ${word.ant.map(a => `<span class="synonym">${a}</span>`).join('') || "No antonyms available"}
-         </div>` : ''}
-     ${word.sen ? `
-         <h3>Example Sentences</h3>
-         <ul style="margin-left: 20px;">
-            ${word.sen.map(s => `<li>${s}</li>`).join('')}
-         </ul>
-     ` : ''}
-    <h3>From Dictionary</h3>
-    <div class="dictionary_img">
-    <img src="${dictionary_img}" alt="Dictionary Image" onerror="this.onerror=null;this.outerHTML='<span>Not available for this word</span>';">
-     </div>
-     `;
+                    <div class="word-header">
+                        <h1 style="font-style: italic;" onclick="pronounce('${audioUrl}')">${word.en} <i class="fas fa-volume-up"></i></h1>
+                    </div>
+                    <p>${phonetics}</p>
+                    <div class="synonym-list">${pos.map(p => `<span class="synonym">${p}</span>`).join('') || ""}</div>
+                    <h3><i class="fas fa-language"></i> Bangla Meaning</h3>
+                    <p>${word.bn?.join(', ') || 'No translation available'}</p>
+                    <h3><i class="fas fa-book"></i> Definition</h3>
+                    <ul style="list-style: disc; margin-left: 20px;">
+                        ${word.def ? word.def.map(d => `<li>${d}</li>`).join('') : '<li>No definition available</li>'}
+                    </ul>
+                    ${word.syn ? `
+                        <h3><i class="fas fa-sync-alt"></i> Synonyms</h3>
+                        <div class="synonym-list">
+                            ${word.syn.map(s => `<span class="synonym">${s}</span>`).join('') || "No synonyms available"}
+                        </div>
+                    ` : ''}
+                    ${word.ant ? `
+                        <h3><i class="fas fa-exchange-alt"></i> Antonyms</h3>
+                        <div class="synonym-list">
+                            ${word.ant.map(a => `<span class="synonym">${a}</span>`).join('') || "No antonyms available"}
+                        </div>` : ''}
+                    ${word.sen ? `
+                        <h3><i class="fas fa-comment"></i> Example Sentences</h3>
+                        <ul style="margin-left: 20px;">
+                            ${word.sen.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+                    <h3><i class="fas fa-images"></i> From Dictionary</h3>
+                    <div class="dictionary_img">
+                        <img src="${dictionary_img}" alt="Dictionary Image" onerror="this.onerror=null;this.outerHTML='<span>Not available for this word</span>';">
+                    </div>
+                `;
                 wordDetails.style.display = 'block';
                 suggestionsContainer.style.display = 'none';
                 searchInput.value = word.en;
@@ -894,11 +1049,9 @@
             } catch (err) {
                 console.error('Failed to fetch additional word details:', err);
             }
-
         }
 
         function pronounce(audioUrl) {
-
             if (audioUrl) {
                 const audio = new Audio(audioUrl);
                 audio.play();
@@ -922,7 +1075,6 @@
 
         // Initialize the application
         loadDictionary();
-
     </script>
 </body>
 
