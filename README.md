@@ -59,7 +59,7 @@ Enter any valid URL containing English text. The script will automatically:
 
 ---
 ## Screenshot
-![App screenshot](/img/screenshot.png)
+![App screenshot](/img/screenshot-wide.png)
 
 ---
 
