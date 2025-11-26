@@ -58,6 +58,10 @@ Enter any valid URL containing English text. The script will automatically:
 4. Merge everything into your local `dictionary.json`
 
 ---
+## Screenshot
+![App screenshot](/img/screenshot.png)
+
+---
 
 ## 🧾 Example Output
 
