@@ -1,584 +1,893 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>E2B Dictionary</title>
+  <title>E2B Bangla · dictionary</title>
+  <!-- PWA manifest & icons (same as before, updated theme-color) -->
   <link rel="manifest" href="./manifest.json" />
-  <meta name="theme-color" content="#B23A48" />
+  <meta name="theme-color" content="#9B4B4E" /> <!-- softer primary -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="apple-touch-icon" href="./img/logo.png" />
   <link rel="icon" type="image/png" href="./img/logo.png" />
+  <!-- font & style reset -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Merriweather:wght@400;700&family=Noto+Sans+Bengali:wght@400;600&display=swap"
+    rel="stylesheet">
   <style>
+    /* ----- MODERN RESET / DESIGN SYSTEM (UX overhaul) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     :root {
-      --primary: #b23a48;
-      --primary-light: #d85b6a;
-      --bg: #f4f6f8;
+      --primary: #9B4B4E;
+      /* warm, accessible */
+      --primary-soft: #b77b7d;
+      --primary-bg: #fef6f7;
+      /* light background for cards */
+      --bg-light: #fafbfc;
       --surface: #ffffff;
-      --text: #1e1e1e;
-      --text-secondary: #6b7280;
-      --border: #e5e7eb;
-      --shadow-soft: 0 10px 30px rgba(30, 30, 30, 0.08);
-      --shadow-hover: 0 16px 38px rgba(30, 30, 30, 0.14);
-      --radius-lg: 20px;
-      --radius-xl: 24px;
-      --focus: 0 0 0 4px rgba(178, 58, 72, 0.18);
+      --text-main: #1e2b37;
+      --text-muted: #5e6f7d;
+      --border-light: #e2e8f0;
+      --shadow-card: 0 20px 35px -8px rgba(0, 15, 30, 0.1), 0 4px 8px rgba(0, 0, 0, 0.02);
+      --radius-md: 18px;
+      --radius-lg: 28px;
+      --transition: all 0.2s ease;
     }
 
     body.dark-mode {
-      --primary: #cc4c5b;
-      --primary-light: #e06776;
-      --bg: #1c1f24;
-      --surface: #242830;
-      --text: #f4f5f7;
-      --text-secondary: #b4bbc7;
-      --border: #3a424f;
-      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.38);
-      --shadow-hover: 0 18px 42px rgba(0, 0, 0, 0.55);
-      --focus: 0 0 0 4px rgba(204, 76, 91, 0.24);
+      --primary: #c98a8d;
+      --primary-soft: #a47274;
+      --primary-bg: #2d2f36;
+      --bg-light: #1e2128;
+      --surface: #2b2f3a;
+      --text-main: #edeef2;
+      --text-muted: #aab3c5;
+      --border-light: #3d4354;
+      --shadow-card: 0 20px 30px -8px rgba(0, 0, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.6);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Inter, "Noto Sans Bengali", "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.55;
+      font-family: 'Inter', 'Noto Sans Bengali', system-ui, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-main);
+      line-height: 1.5;
       min-height: 100vh;
+      padding-bottom: 1.5rem;
     }
 
-    .app-shell { width: min(1400px, 96vw); margin: 0 auto 2rem; }
+    /* ----- LAYOUT + STICKY HEADER REFINED ----- */
+    .app-wrap {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
 
-    .top-header {
+    .sticky-header {
       position: sticky;
       top: 0;
       z-index: 30;
-      background: linear-gradient(150deg, var(--primary) 0%, #992f3e 100%);
-      border-bottom-left-radius: var(--radius-xl);
-      border-bottom-right-radius: var(--radius-xl);
-      color: #fff;
-      box-shadow: 0 8px 24px rgba(178, 58, 72, 0.32);
+      background-color: #9B4B4E;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 0 0 32px 32px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 1.4rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
     }
 
-    .header-inner {
-      height: 72px;
-      padding: 0 1rem;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
+    .header-grid {
+      display: flex;
       align-items: center;
-      gap: .5rem;
+      justify-content: space-between;
+      height: 70px;
+      width: 100%;
     }
 
-    .left-actions, .right-actions { display: flex; gap: .35rem; align-items: center; }
-    .right-actions { justify-content: flex-end; }
-
-    .icon-btn {
-      border: none;
-      background: rgba(255,255,255,0.16);
-      color: #fff;
-      width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      transition: transform .18s ease, background .25s ease;
+    .header-left,
+    .header-right {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
     }
-    .icon-btn:hover { background: rgba(255,255,255,0.24); transform: translateY(-1px); }
-    .icon-btn:active { transform: scale(.95); }
-    .icon-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
-    .word-focus-title {
-      text-align: center;
-      font-weight: 700;
-      letter-spacing: .01em;
-      opacity: 0;
-      transform: translateY(4px);
-      transition: opacity .22s ease, transform .22s ease;
+    .header-center {
+      font-weight: 650;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      padding: 0.5rem 1.2rem;
+      border-radius: 60px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      padding: 0 .5rem;
-    }
-    .word-focus-title.active { opacity: 1; transform: translateY(0); }
-
-    .install-pill {
-      animation: breathe 2.4s ease-in-out infinite;
-      box-shadow: 0 0 0 0 rgba(255,255,255,.36);
-    }
-    @keyframes breathe {
-      0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,.2); }
-      50% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+      max-width: 45vw;
     }
 
-    .grid-layout {
-      margin-top: 1rem;
+    .icon-btn {
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      width: 44px;
+      height: 44px;
+      border-radius: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.94);
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .pill-install {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .pill-install:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    /* ----- 3‑COLUMN GRID (adaptive) ----- */
+    .dictionary-grid {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
+      grid-template-columns: 240px minmax(0, 1fr) 260px;
+      gap: 1.2rem;
+      align-items: start;
     }
 
     .panel {
       background: var(--surface);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-soft);
-      padding: 1rem;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: 1.4rem 1rem;
+      transition: transform 0.1s ease;
     }
 
-    .search-wrap { position: relative; }
+    /* left & right columns — visible only on large */
+    .left-col,
+    .right-col {
+      display: block;
+    }
+
+    /* ----- SEARCH & SUGGEST (center stage) ----- */
+    .search-container {
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1.2rem;
+    }
+
     .search-input {
       width: 100%;
-      border: 1px solid transparent;
+      border: 2px solid transparent;
       background: var(--surface);
-      border-radius: 999px;
-      box-shadow: var(--shadow-soft);
-      padding: .95rem 1rem .95rem 2.8rem;
-      font-size: 1rem;
-      color: var(--text);
+      border-radius: 48px;
+      padding: 1rem 1rem 1rem 3rem;
+      font-size: 1.1rem;
+      color: var(--text-main);
       outline: none;
-      transition: box-shadow .22s ease, border-color .22s ease;
+      /* box-shadow: var(--shadow-card); */
+      transition: 0.15s;
     }
-    .search-input:focus { border-color: var(--primary); box-shadow: var(--shadow-soft), var(--focus); }
-    .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+      box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 12%, transparent);
+      border-radius: 30px;
+    }
 
     .suggestions {
-      position: absolute; top: calc(100% + .45rem); left: 0; right: 0;
-      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-      box-shadow: var(--shadow-soft); overflow: hidden; max-height: 50vh; overflow-y: auto;
-      display: none; transform-origin: top; animation: dropdown .2s ease;
-      z-index: 20;
-    }
-    @keyframes dropdown { from { opacity:0; transform: translateY(-6px) scale(.985);} to { opacity:1; transform: translateY(0) scale(1);} }
-
-    .suggestion-item { padding: .72rem .9rem; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; gap: .8rem; }
-    .suggestion-item:last-child { border-bottom: none; }
-    .suggestion-item:hover { background: color-mix(in srgb, var(--primary) 8%, var(--surface)); }
-    .suggestion-word { font-weight: 600; }
-    .suggestion-bn { color: var(--text-secondary); }
-
-    .offline-banner {
-      margin-top: .9rem;
-      padding: .65rem .8rem;
-      border-radius: 12px;
-      border: 1px dashed var(--border);
-      color: var(--text-secondary);
-      font-size: .92rem;
-      display: none;
-    }
-
-    .word-card {
-      margin-top: 1rem;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-soft);
-      padding: 1.25rem;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      max-height: 380px;
+      overflow-y: auto;
       display: none;
-      animation: rise .28s ease;
-    }
-    @keyframes rise { from { opacity:0; transform: translateY(16px);} to { opacity:1; transform: translateY(0);} }
-
-    .word-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
-    .word-title { font-family: "Merriweather", Georgia, serif; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 700; }
-    .phonetic { color: var(--text-secondary); margin-top: .2rem; font-size: 1rem; }
-    .audio-btn.pulse { animation: pulse .6s ease; }
-    @keyframes pulse { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 100%{transform:scale(1)} }
-
-    .badge-list { margin-top: .7rem; display: flex; flex-wrap: wrap; gap: .45rem; }
-    .badge { padding: .24rem .65rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border)); color: var(--primary); font-size: .75rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
-
-    .section { margin-top: 1.1rem; }
-    .section-title { font-size: .95rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .45rem; }
-    .meaning-text { font-size: 1.2rem; font-weight: 600; background: color-mix(in srgb, var(--primary) 8%, var(--surface)); padding: .8rem; border-radius: 12px; border-left: 4px solid var(--primary); }
-
-    .tag-list { display: flex; flex-wrap: wrap; gap: .45rem; }
-    .tag { border: 1px solid var(--border); border-radius: 999px; padding: .28rem .62rem; font-size: .85rem; }
-    .example-item { padding: .6rem 0; border-top: 1px solid var(--border); color: var(--text-secondary); font-style: italic; }
-    .example-item:first-child { border-top: none; }
-
-    .skeleton {
-      height: 14px;
-      border-radius: 8px;
-      margin-bottom: .65rem;
-      background: linear-gradient(100deg, color-mix(in srgb, var(--surface) 70%, var(--border)) 25%, color-mix(in srgb, var(--border) 75%, var(--surface)) 38%, color-mix(in srgb, var(--surface) 70%, var(--border)) 63%);
-      background-size: 400% 100%;
-      animation: shimmer 1.3s infinite linear;
-    }
-    @keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
-
-    .side-title { font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-secondary); margin-bottom: .7rem; font-weight: 700; }
-    .recent-list, .quick-list { list-style: none; display: grid; gap: .4rem; }
-    .mini-btn { width: 100%; text-align: left; border: 1px solid var(--border); background: transparent; color: var(--text); border-radius: 10px; padding: .5rem .65rem; cursor: pointer; transition: .2s; }
-    .mini-btn:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--primary) 36%, var(--border)); }
-
-    .welcome-card { text-align: center; padding: 1.6rem 1rem; color: var(--text-secondary); }
-    .welcome-card h2 { color: var(--text); margin-bottom: .35rem; }
-
-    .bookmark-active { color: #ffecf0; background: rgba(255, 255, 255, 0.34); }
-
-    @media (min-width: 1024px) {
-      .grid-layout { grid-template-columns: 260px minmax(0, 1fr) 290px; align-items: start; }
-      .center-col { max-width: 1100px; width: 100%; margin: 0 auto; }
-      .top-header { border-radius: 0 0 24px 24px; }
-      .search-input { font-size: 1.07rem; padding-top: 1.05rem; padding-bottom: 1.05rem; }
-      .panel:hover { box-shadow: var(--shadow-hover); transition: box-shadow .22s ease; }
+      z-index: 50;
+      backdrop-filter: blur(6px);
     }
 
-    @media (max-width: 1023px) {
-      .left-col, .right-col { display: none; }
-      .app-shell { width: min(820px, 100%); }
-      .center-col { padding: 0 .8rem; }
+    .suggestion-item {
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      transition: 0.1s;
+    }
+
+    .suggestion-item:hover {
+      background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+    }
+
+    .suggestion-word {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .suggestion-bn {
+      color: var(--text-muted);
+      font-family: 'Noto Sans Bengali';
+    }
+
+    .offline-chip {
+      background: color-mix(in srgb, #f0b400 20%, var(--surface));
+      border: 1px dashed #f0b400;
+      border-radius: 60px;
+      padding: 0.5rem 1.2rem;
+      font-size: 0.9rem;
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0.5rem 0;
+      color: var(--text-main);
+    }
+
+    /* word card premium */
+    .word-card {
+      display: none;
+      animation: cardRise 0.3s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    @keyframes cardRise {
+      from {
+        opacity: 0.3;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .word-title {
+      font-family: 'Merriweather', serif;
+      font-size: 2.2rem;
+      line-height: 1.2;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .phonetic-badge {
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 400;
+      margin-left: 0.5rem;
+    }
+
+    .audio-button {
+      background: color-mix(in srgb, var(--primary) 8%, transparent);
+      border-radius: 100px;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid var(--border-light);
+      display: inline-flex;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: 0.2s;
+      color: var(--text-main);
+      font-family: inherit;
+    }
+
+    .audio-button:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .meaning-bangla {
+      background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+      border-left: 5px solid var(--primary);
+      border-radius: 18px;
+      padding: 1.2rem;
+      margin: 1rem 0;
+      font-size: 1.4rem;
+      font-weight: 600;
+      font-family: 'Noto Sans Bengali';
+    }
+
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.8rem;
+      margin: 0.8rem 0;
+    }
+
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: 30px;
+      padding: 0.3rem 1rem;
+      font-size: 0.9rem;
+      transition: 0.1s;
+    }
+
+    .chip:hover {
+      border-color: var(--primary);
+    }
+
+    .example-text {
+      padding: 0.7rem 0;
+      border-bottom: 1px dashed var(--border-light);
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .skeleton-block {
+      height: 24px;
+      background: linear-gradient(100deg, var(--border-light) 20%, color-mix(in srgb, white 70%, var(--border-light)) 50%, var(--border-light) 80%);
+      background-size: 200% 100%;
+      animation: ske 1.2s infinite;
+      border-radius: 30px;
+      margin-bottom: 0.8rem;
+    }
+
+    @keyframes ske {
+      0% {
+        background-position: 100% 0;
+      }
+
+      100% {
+        background-position: -100% 0;
+      }
+    }
+
+    /* left column specifics */
+    .side-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .recent-item,
+    .mini-link {
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0.7rem;
+      border-radius: 40px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid transparent;
+      transition: 0.15s;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    .recent-item:hover,
+    .mini-link:hover {
+      background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+      border-color: var(--border-light);
+    }
+
+    .recent-item span {
+      font-weight: 500;
+    }
+
+    .recent-item small {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    /* right column "word of the day" big */
+    .wod-card {
+      background: var(--primary-bg);
+      border-radius: 28px;
+      padding: 1.2rem 1rem;
+      margin-bottom: 1.4rem;
+      border: 1px solid var(--border-light);
+    }
+
+    .wod-word {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.3rem;
+    }
+
+    .wod-meaning {
+      font-family: 'Noto Sans Bengali';
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .suggest-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+    }
+
+    .suggest-tag {
+      background: transparent;
+      border: 1px solid var(--border-light);
+      border-radius: 40px;
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.1s;
+      font-family: inherit;
+    }
+
+    .suggest-tag:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .install-note {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      padding: 1rem 0;
+      border-top: 1px dashed var(--border-light);
+    }
+
+    .welcome-card {
+      text-align: center;
+      padding: 2.8rem 1rem;
+    }
+
+    .welcome-card h3 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .welcome-card p {
+      color: var(--text-muted);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .bookmark-active {
+      background: var(--primary) !important;
+      color: white;
+      border-color: var(--primary) !important;
+    }
+
+    .center-col {
+      display: contents;
+    }
+
+    @media (max-width: 1000px) {
+      .dictionary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .left-col,
+      .right-col {
+        display: none;
+      }
+
+      .header-center {
+        font-size: 1rem;
+        max-width: 50vw;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="app-shell">
-    <header class="top-header">
-      <div class="header-inner">
-        <div class="left-actions">
-          <button id="backBtn" class="icon-btn" title="Back to search" aria-label="Back to search">
-            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l4.88-4.88a1 1 0 0 0-1.42-1.41l-6.59 6.58a1 1 0 0 0 0 1.42l6.59 6.58a1 1 0 1 0 1.42-1.41L7.83 13H20a1 1 0 1 0 0-2z"/></svg>
-          </button>
-          <button id="themeBtn" class="icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode">
-            <svg viewBox="0 0 24 24"><path d="M12 3a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1Zm0 14a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm8-6a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2h-2a1 1 0 0 1-1-1ZM1 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H2a1 1 0 0 1-1-1Zm16.95 6.54a1 1 0 0 1 1.41 0l1.42 1.41a1 1 0 1 1-1.42 1.42l-1.41-1.42a1 1 0 0 1 0-1.41ZM3.22 4.81a1 1 0 0 1 1.42 0l1.41 1.42A1 1 0 1 1 4.63 7.64L3.22 6.23a1 1 0 0 1 0-1.42Zm16.14-.01a1 1 0 0 1 1.42 1.41l-1.42 1.42a1 1 0 0 1-1.41-1.42l1.41-1.41Zm-13.3 13.3a1 1 0 0 1 1.42 1.41l-1.42 1.42a1 1 0 1 1-1.41-1.42l1.41-1.41Z"/></svg>
+  <div class="app-wrap">
+    <!-- STICKY HEADER (redesigned) -->
+    <div class="sticky-header">
+      <div class="header-grid">
+        <div class="header-left">
+          <button id="themeBtn" class="icon-btn" title="Light/dark">
+            <svg xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+              <path
+                d="M320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576C388.8 576 451.3 548.8 497.3 504.6C504.6 497.6 506.7 486.7 502.6 477.5C498.5 468.3 488.9 462.6 478.8 463.4C473.9 463.8 469 464 464 464C362.4 464 280 381.6 280 280C280 207.9 321.5 145.4 382.1 115.2C391.2 110.7 396.4 100.9 395.2 90.8C394 80.7 386.6 72.5 376.7 70.3C358.4 66.2 339.4 64 320 64z" />
+            </svg>
           </button>
         </div>
-        <div id="focusTitle" class="word-focus-title">E2B Dictionary</div>
-        <div class="right-actions">
-          <button id="bookmarkBtn" class="icon-btn" title="Bookmark word" aria-label="Bookmark word">
-            <svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-3 7 3V5a2 2 0 0 0-2-2Z"/></svg>
-          </button>
-          <button id="copyBtn" class="icon-btn" title="Copy word details" aria-label="Copy word details">
-            <svg viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm4 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h12v14Z"/></svg>
-          </button>
-          <button id="installBtn" class="icon-btn install-pill" title="Install app" aria-label="Install app" style="display:none;">
-            <svg viewBox="0 0 24 24"><path d="M19 15v4H5v-4H3v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4h-2Zm-8-1.17 2.59-2.58L15 12.66l-3 3-3-3 1.41-1.41L11 13.83ZM11 3h2v9h-2V3Z"/></svg>
-          </button>
+        <div id="focusTitle" class="header-center" >E2B Dictionary
+        </div>
+        <div class="header-right">
+          <button id="copyBtn" class="icon-btn" title="Copy meaning"><svg viewBox="0 0 24 24">
+              <path
+                d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm4 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z" />
+            </svg></button>
+          <button id="bookmarkBtn" class="icon-btn" title="Bookmark word"><svg viewBox="0 0 24 24">
+              <path d="M5 2h14c1.1 0 2 .9 2 2v20l-9-4-9 4V4c0-1.1.9-2 2-2z" />
+            </svg></button>
+          <button id="installBtn" class="icon-btn pill-install" style="display:none;" title="Install app"><svg
+              viewBox="0 0 24 24">
+              <path
+                d="M19 15v4H5v-4H3v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4h-2Zm-8-1.17 2.59-2.58L15 12.66l-3 3-3-3 1.41-1.41L11 13.83ZM11 3h2v9h-2V3Z" />
+            </svg></button>
         </div>
       </div>
-    </header>
-
-    <div class="grid-layout">
+      <main class="center-col">
+        <div class="search-container">
+          <span class="search-icon"><i class="fa fa-search" aria-hidden="true"></i></span>
+          <input id="searchInput" class="search-input" type="text" placeholder="Search any English word..."
+            autocomplete="off" />
+          <div id="suggestions" class="suggestions"></div>
+        </div>
+        <div id="offlineBanner" class="offline-chip">📡 offline — using cached dictionary</div>
+      </main>
+    </div>
+    <!-- 3‑COLUMN GRID -->
+    <div class="dictionary-grid">
+      <!-- LEFT COL: recent & quick -->
       <aside class="left-col panel">
-        <div class="side-title">Recent searches</div>
-        <ul id="recentList" class="recent-list"></ul>
-        <div class="side-title" style="margin-top:1rem;">Quick links</div>
-        <ul class="quick-list">
-          <li><button class="mini-btn" data-quick="serendipity">Serendipity</button></li>
-          <li><button class="mini-btn" data-quick="scholar">Scholar</button></li>
-          <li><button class="mini-btn" data-quick="vocabulary">Vocabulary</button></li>
+        <div class="side-label"><i class="fa fa-clock-o"></i> recent searches</div>
+        <ul id="recentList" style="list-style: none; margin-bottom: 2rem;">
+          <p style="color: #5e6f7d; font-family: monospace;">Nothing to show :(</p>
         </ul>
       </aside>
 
-      <main class="center-col">
-        <section class="search-wrap">
-          <span class="search-icon">🔎</span>
-          <input id="searchInput" class="search-input" type="text" placeholder="Search English word (e.g., eloquent)" autocomplete="off" />
-          <div id="suggestions" class="suggestions"></div>
-        </section>
-        <div id="offlineBanner" class="offline-banner">You are currently offline. Cached dictionary entries are still available.</div>
+      <!-- CENTER COLUMN: main action -->
+      <div style="display:contents;">
+        <!-- welcome / word card -->
+        <div id="welcomeView" class="panel welcome-card">
+          <h3><i class="fa fa-book" aria-hidden="true"></i> E2B Dictionary</h3>
+          <p>Bangla meanings, phonetics, synonyms, examples. Search above.</p>
+          <div style="margin-top:1.2rem; color: var(--primary);"><i class="fa fa-arrow-up" aria-hidden="true"></i> start
+            typing</div>
+        </div>
 
-        <section id="welcomeView" class="panel welcome-card">
-          <h2>Premium English → Bangla Dictionary</h2>
-          <p>Search a word to view pronunciation, part of speech, Bangla meanings, synonyms, antonyms, and example usage.</p>
-        </section>
+        <div id="wordCard" class="word-card panel"></div>
+      </div>
 
-        <section id="wordCard" class="word-card"></section>
-      </main>
-
+      <!-- RIGHT COLUMN: word of day, suggested, PWA hint -->
       <aside class="right-col panel">
-        <div class="side-title">Word of the day</div>
-        <button id="wordOfDayBtn" class="mini-btn"></button>
-        <div class="side-title" style="margin-top:1rem;">Suggested words</div>
-        <div id="suggestedWords" class="tag-list"></div>
-        <div class="side-title" style="margin-top:1rem;">Install as app</div>
-        <p style="color:var(--text-secondary);font-size:.9rem;">Install for offline access and a distraction-free study flow.</p>
-        <div class="side-title" style="margin-top:1rem;">Keyboard shortcuts</div>
-        <p style="color:var(--text-secondary);font-size:.9rem;">/ Focus search<br>Esc Close suggestions</p>
+        <div class="wod-card">
+          <div style="font-size:0.85rem; color:var(--text-muted);">✨ word of the day</div>
+          <div id="wodWord" class="wod-word">—</div>
+          <div id="wodMeaning" class="wod-meaning"></div>
+          <button id="wordOfDayBtn" style="margin-top:0.8rem; width:100%;" class="mini-link">see details <i
+              class="fa fa-arrow-right" aria-hidden="true"></i></button>
+        </div>
+
+        <div class="side-label"><i class="fa fa-search" aria-hidden="true"></i> suggested words</div>
+        <div id="suggestedWords" class="suggest-tags" style="color:var(--text-muted);"></div>
+
+        <div class="install-note">
+          <strong><i class="fa fa-download" aria-hidden="true"></i> PWA ready</strong><br>
+          <span style="font-size:0.8rem;">Install for offline use & quick access.</span>
+        </div>
+        <div
+          style="margin-top:1rem; font-size:0.8rem; background: var(--primary-bg); border-radius:30px; padding:0.6rem;">
+          "<b>/</b>" to search</div>
       </aside>
     </div>
   </div>
 
   <script>
-    const CONFIG = {
-      dictionaryUrl: 'https://raw.githubusercontent.com/towfikahmed0/e2b_dictionary/main/dictionary.json',
-      apiBase: 'https://api.dictionaryapi.dev/api/v2/entries/en/'
-    };
+    (function () {
+      // ---------- CONFIG ----------
+      const DICT_URL = 'https://raw.githubusercontent.com/towfikahmed0/e2b_dictionary/main/dictionary.json';
+      const API_BASE = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
 
-    const DOM = {
-      searchInput: document.getElementById('searchInput'),
-      suggestions: document.getElementById('suggestions'),
-      wordCard: document.getElementById('wordCard'),
-      welcomeView: document.getElementById('welcomeView'),
-      focusTitle: document.getElementById('focusTitle'),
-      backBtn: document.getElementById('backBtn'),
-      copyBtn: document.getElementById('copyBtn'),
-      bookmarkBtn: document.getElementById('bookmarkBtn'),
-      installBtn: document.getElementById('installBtn'),
-      themeBtn: document.getElementById('themeBtn'),
-      offlineBanner: document.getElementById('offlineBanner'),
-      recentList: document.getElementById('recentList'),
-      wordOfDayBtn: document.getElementById('wordOfDayBtn'),
-      suggestedWords: document.getElementById('suggestedWords')
-    };
+      // DOM elements
+      const el = {
+        searchInput: document.getElementById('searchInput'),
+        suggestions: document.getElementById('suggestions'),
+        wordCard: document.getElementById('wordCard'),
+        welcomeView: document.getElementById('welcomeView'),
+        focusTitle: document.getElementById('focusTitle'),
+        copyBtn: document.getElementById('copyBtn'),
+        bookmarkBtn: document.getElementById('bookmarkBtn'),
+        installBtn: document.getElementById('installBtn'),
+        themeBtn: document.getElementById('themeBtn'),
+        offlineBanner: document.getElementById('offlineBanner'),
+        recentList: document.getElementById('recentList'),
+        wordOfDayBtn: document.getElementById('wordOfDayBtn'),
+        suggestedWords: document.getElementById('suggestedWords'),
+        wodWord: document.getElementById('wodWord'),
+        wodMeaning: document.getElementById('wodMeaning'),
+      };
 
-    let dictionary = [];
-    let deferredPrompt;
-    let currentWord;
-    const recentKey = 'e2b_recent_searches';
-    const bookmarkKey = 'e2b_bookmarks';
+      // data
+      let dictionary = [];               // raw { en, bn, syn, ant, ... }
+      let currentWord = null;
+      let deferredPrompt;
 
-    const readJson = (key, fallback = []) => {
-      try { return JSON.parse(localStorage.getItem(key)) || fallback; }
-      catch { return fallback; }
-    };
+      // storage helpers
+      const getStorage = (key, def = []) => { try { return JSON.parse(localStorage.getItem(key)) || def; } catch { return def; } };
+      const setStorage = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 
-    const setOnlineState = () => {
-      DOM.offlineBanner.style.display = navigator.onLine ? 'none' : 'block';
-    };
+      const RECENT_KEY = 'e2b_recent';
+      const BOOKMARK_KEY = 'e2b_bookmarks';
+      const THEME_KEY = 'theme';
 
-    const setTheme = (isDark) => {
-      document.body.classList.toggle('dark-mode', isDark);
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    };
-
-    const toggleTheme = () => setTheme(!document.body.classList.contains('dark-mode'));
-
-    const renderRecent = () => {
-      const recent = readJson(recentKey);
-      DOM.recentList.innerHTML = recent.length
-        ? recent.map((word) => `<li><button class="mini-btn" data-recent="${word}">${word}</button></li>`).join('')
-        : '<li style="color:var(--text-secondary);font-size:.9rem;">No recent searches yet.</li>';
-    };
-
-    const addRecent = (word) => {
-      const recent = readJson(recentKey).filter((w) => w !== word);
-      recent.unshift(word);
-      localStorage.setItem(recentKey, JSON.stringify(recent.slice(0, 10)));
-      renderRecent();
-    };
-
-    const updateBookmarkState = () => {
-      if (!currentWord) {
-        DOM.bookmarkBtn.classList.remove('bookmark-active');
-        return;
-      }
-      const bookmarks = readJson(bookmarkKey);
-      DOM.bookmarkBtn.classList.toggle('bookmark-active', bookmarks.includes(currentWord.en));
-    };
-
-    const toggleBookmark = () => {
-      if (!currentWord) return;
-      const bookmarks = readJson(bookmarkKey);
-      const exists = bookmarks.includes(currentWord.en);
-      const next = exists ? bookmarks.filter((w) => w !== currentWord.en) : [...bookmarks, currentWord.en];
-      localStorage.setItem(bookmarkKey, JSON.stringify(next));
-      DOM.bookmarkBtn.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' });
-      updateBookmarkState();
-    };
-
-    const showSkeleton = () => {
-      DOM.wordCard.style.display = 'block';
-      DOM.wordCard.innerHTML = '<div class="skeleton" style="width:48%"></div><div class="skeleton" style="width:30%"></div><div class="skeleton" style="height:52px"></div><div class="skeleton" style="width:95%"></div><div class="skeleton" style="width:86%"></div>';
-    };
-
-    const search = (query) => {
-      const q = query.trim().toLowerCase();
-      if (!q) {
-        DOM.suggestions.style.display = 'none';
-        return;
-      }
-      const matches = dictionary.filter((w) => w.en.toLowerCase().startsWith(q)).slice(0, 10);
-      DOM.suggestions.innerHTML = matches.length
-        ? matches.map((w) => `<div class="suggestion-item" data-word="${w.en}"><span class="suggestion-word">${w.en}</span><span class="suggestion-bn">${(w.bn && w.bn[0]) || ''}</span></div>`).join('')
-        : '<div class="suggestion-item">No results found</div>';
-      DOM.suggestions.style.display = 'block';
-    };
-
-    const copyCurrentWord = async () => {
-      if (!currentWord) return;
-      const text = `${currentWord.en} — ${(currentWord.bn || []).join(', ')}`;
-      try { await navigator.clipboard.writeText(text); DOM.copyBtn.style.background = 'rgba(92, 255, 195, 0.34)'; setTimeout(() => DOM.copyBtn.style.background = '', 600); }
-      catch { }
-    };
-
-    const playAudio = (audioUrl, el) => {
-      if (!audioUrl) return;
-      new Audio(audioUrl).play();
-      el.classList.remove('pulse');
-      void el.offsetWidth;
-      el.classList.add('pulse');
-    };
-
-    const setHeaderWord = (value) => {
-      DOM.focusTitle.textContent = value || 'E2B Dictionary';
-      DOM.focusTitle.classList.toggle('active', !!value);
-    };
-
-    const renderWordCard = (data) => {
-      const phonetics = data.phonetics?.map((p) => p.text).filter(Boolean).join(' • ');
-      const audioUrl = data.phonetics?.find((p) => p.audio)?.audio;
-      const partOfSpeech = [...new Set((data.meanings || []).map((m) => m.partOfSpeech).filter(Boolean))];
-      const defs = data.def || data.meanings?.flatMap((m) => (m.definitions || []).map((d) => d.definition)).filter(Boolean) || [];
-      const examples = data.meanings?.flatMap((m) => (m.definitions || []).map((d) => d.example)).filter(Boolean) || [];
-
-      DOM.wordCard.innerHTML = `
-        <div class="word-head">
-          <div>
-            <h1 class="word-title">${data.en}</h1>
-            ${phonetics ? `<div class="phonetic">${phonetics}</div>` : ''}
-          </div>
-          ${audioUrl ? `<button id="audioBtn" class="icon-btn audio-btn" style="background:color-mix(in srgb,var(--primary) 20%, transparent);"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3Zm13.5 3c0-1.78-1.01-3.3-2.5-4.03v8.06a4.48 4.48 0 0 0 2.5-4.03ZM14 3.23v2.06A7.01 7.01 0 0 1 19 12a7.01 7.01 0 0 1-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77Z"/></svg></button>` : ''}
-        </div>
-        ${partOfSpeech.length ? `<div class="badge-list">${partOfSpeech.map((pos) => `<span class="badge">${pos}</span>`).join('')}</div>` : ''}
-
-        <div class="section"><div class="section-title">Bangla meaning</div><div class="meaning-text">${(data.bn || []).join(', ') || 'N/A'}</div></div>
-
-        ${data.syn?.length ? `<div class="section"><div class="section-title">Synonyms</div><div class="tag-list">${data.syn.slice(0, 8).map((s) => `<span class="tag">${s}</span>`).join('')}</div></div>` : ''}
-        ${data.ant?.length ? `<div class="section"><div class="section-title">Antonyms</div><div class="tag-list">${data.ant.slice(0, 8).map((a) => `<span class="tag">${a}</span>`).join('')}</div></div>` : ''}
-        ${defs.length ? `<div class="section"><div class="section-title">Definitions</div>${defs.slice(0, 3).map((d) => `<div class="example-item" style="font-style:normal;color:var(--text)">${d}</div>`).join('')}</div>` : ''}
-        ${examples.length ? `<div class="section"><div class="section-title">Examples</div>${examples.slice(0, 3).map((ex) => `<div class="example-item">“${ex}”</div>`).join('')}</div>` : ''}
-      `;
-
-      if (audioUrl) {
-        document.getElementById('audioBtn').addEventListener('click', (e) => playAudio(audioUrl, e.currentTarget));
-      }
-    };
-
-    const displayWord = async (word) => {
-      currentWord = word;
-      addRecent(word.en);
-      setHeaderWord(word.en);
-      DOM.searchInput.value = word.en;
-      DOM.suggestions.style.display = 'none';
-      DOM.welcomeView.style.display = 'none';
-      showSkeleton();
-      updateBookmarkState();
-
-      let merged = { ...word };
-      try {
-        const res = await fetch(CONFIG.apiBase + encodeURIComponent(word.en));
-        if (res.ok) {
-          const data = await res.json();
-          merged = { ...word, ...(data[0] || {}) };
+      // --- recent UI ---
+      const renderRecent = () => {
+        const recents = getStorage(RECENT_KEY, []);
+        if (recents.length) {
+          el.recentList.innerHTML = recents.map(w => `<li><button class="recent-item" data-recent="${w}"><span><span><i class="fa fa-angle-right" aria-hidden="true"></i> ${w}</span> <small>recent</small></button></li>`).join('');
+        } else {
+          el.recentList.innerHTML = '<li style="color:var(--text-muted); padding:0.5rem;">No searches yet</li>';
         }
-      } catch (e) {
-        console.warn('Remote detail fetch failed, local data shown.');
-      }
+      };
 
-      DOM.wordCard.style.display = 'block';
-      renderWordCard(merged);
-      currentWord = merged;
-      updateBookmarkState();
-    };
+      const addRecent = (word) => {
+        let recents = getStorage(RECENT_KEY, []);
+        recents = [word, ...recents.filter(w => w !== word)].slice(0, 10);
+        setStorage(RECENT_KEY, recents);
+        renderRecent();
+      };
 
-    const clearView = () => {
-      currentWord = null;
-      DOM.wordCard.style.display = 'none';
-      DOM.welcomeView.style.display = 'block';
-      setHeaderWord('');
-      updateBookmarkState();
-    };
+      // --- bookmarks ---
+      const updateBookmarkUI = () => {
+        if (!currentWord) { el.bookmarkBtn.classList.remove('bookmark-active'); return; }
+        const bookmarks = getStorage(BOOKMARK_KEY, []);
+        if (bookmarks.includes(currentWord.en)) el.bookmarkBtn.classList.add('bookmark-active');
+        else el.bookmarkBtn.classList.remove('bookmark-active');
+      };
 
-    const randomWord = () => dictionary[Math.floor(Math.random() * dictionary.length)];
+      const toggleBookmark = () => {
+        if (!currentWord) return;
+        const bookmarks = getStorage(BOOKMARK_KEY, []);
+        const idx = bookmarks.indexOf(currentWord.en);
+        if (idx === -1) bookmarks.push(currentWord.en);
+        else bookmarks.splice(idx, 1);
+        setStorage(BOOKMARK_KEY, bookmarks);
+        updateBookmarkUI();
+        el.bookmarkBtn.style.transform = 'scale(1.2)';
+        setTimeout(() => el.bookmarkBtn.style.transform = '', 150);
+      };
 
-    const renderDiscover = () => {
-      if (!dictionary.length) return;
-      const wod = randomWord();
-      DOM.wordOfDayBtn.textContent = `${wod.en} — ${(wod.bn && wod.bn[0]) || ''}`;
-      const picks = [...dictionary].sort(() => 0.5 - Math.random()).slice(0, 7);
-      DOM.suggestedWords.innerHTML = picks.map((w) => `<button class="tag" data-suggest="${w.en}">${w.en}</button>`).join('');
-    };
+      // --- copy ---
+      const copyDetails = async () => {
+        if (!currentWord) return;
+        const bnText = currentWord.bn ? currentWord.bn.join(', ') : '';
+        const text = `${currentWord.en} — ${bnText}`;
+        try {
+          await navigator.clipboard.writeText(text);
+          el.copyBtn.style.background = 'rgba(255,255,255,0.4)';
+          setTimeout(() => el.copyBtn.style.background = '', 200);
+        } catch { }
+      };
 
-    const loadData = async () => {
-      const res = await fetch(CONFIG.dictionaryUrl);
-      dictionary = await res.json();
-      renderRecent();
-      renderDiscover();
-    };
+      // --- theme ---
+      const setTheme = (dark) => document.body.classList.toggle('dark-mode', dark);
+      const toggleTheme = () => {
+        const dark = !document.body.classList.contains('dark-mode');
+        setTheme(dark);
+        localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+      };
 
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
-    }
+      // --- render word card (rich) ---
+      const renderWordCard = (data) => {
+        const bnMeaning = data.bn?.length ? data.bn.join(', ') : '—';
+        const phonetic = data.phonetic || (data.phonetics?.find(p => p.text)?.text) || '';
+        const audioUrl = data.phonetics?.find(p => p.audio)?.audio || null;
+        const pos = data.meanings ? [...new Set(data.meanings.map(m => m.partOfSpeech))] : [];
+        const synonyms = data.syn ? data.syn.slice(0, 10) : [];
+        const antonyms = data.ant ? data.ant.slice(0, 10) : [];
+        const definitions = data.meanings ? data.meanings.flatMap(m => m.definitions.map(d => d.definition)).slice(0, 4) : [];
+        const examples = data.meanings ? data.meanings.flatMap(m => m.definitions.map(d => d.example).filter(Boolean)).slice(0, 3) : [];
 
-    window.addEventListener('beforeinstallprompt', (event) => {
-      event.preventDefault();
-      deferredPrompt = event;
-      DOM.installBtn.style.display = 'grid';
-    });
+        let html = `<div style="display:flex; justify-content:space-between; align-items:start;"><h1 class="word-title">${data.en}</h1>`;
+        if (audioUrl) html += `<button id="audioPlayBtn" class="audio-button"><i class="fa fa-volume-up" aria-hidden="true"></i> listen</button>`;
+        html += `</div>`;
+        if (phonetic) html += `<div class="phonetic-badge">${phonetic}</div>`;
 
-    DOM.installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-      if (choice.outcome === 'accepted') DOM.installBtn.style.display = 'none';
-      deferredPrompt = null;
-    });
+        html += `<div class="meaning-bangla">${bnMeaning}</div>`;
 
-    DOM.searchInput.addEventListener('input', (e) => search(e.target.value));
-    DOM.suggestions.addEventListener('click', (e) => {
-      const row = e.target.closest('[data-word]');
-      if (!row) return;
-      const found = dictionary.find((w) => w.en === row.dataset.word);
-      if (found) displayWord(found);
-    });
+        if (pos.length) html += `<div class="chip-list">${pos.map(p => `<span class="chip">${p}</span>`).join('')}</div>`;
 
-    DOM.backBtn.addEventListener('click', clearView);
-    DOM.copyBtn.addEventListener('click', copyCurrentWord);
-    DOM.bookmarkBtn.addEventListener('click', toggleBookmark);
-    DOM.themeBtn.addEventListener('click', toggleTheme);
+        if (synonyms.length) html += `<div style="margin:1rem 0"><span style="font-weight:600;">synonyms</span> <div class="chip-list">${synonyms.map(s => `<span class="chip">${s}</span>`).join('')}</div></div>`;
+        if (antonyms.length) html += `<div style="margin:1rem 0"><span style="font-weight:600;">antonyms</span> <div class="chip-list">${antonyms.map(a => `<span class="chip">${a}</span>`).join('')}</div></div>`;
 
-    DOM.recentList.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-recent]');
-      if (!btn) return;
-      const found = dictionary.find((w) => w.en === btn.dataset.recent);
-      if (found) displayWord(found);
-    });
+        if (definitions.length) {
+          html += `<div style="margin-top:1rem;"><span style="font-weight:600;">definitions</span>`;
+          definitions.slice(0, 3).forEach(d => html += `<div style="padding:0.5rem 0;">• ${d}</div>`);
+          html += `</div>`;
+        }
 
-    document.querySelectorAll('[data-quick]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const found = dictionary.find((w) => w.en.toLowerCase() === btn.dataset.quick.toLowerCase());
+        if (examples.length) {
+          html += `<div style="margin-top:1rem;"><span style="font-weight:600;">examples</span>`;
+          examples.forEach(ex => html += `<div class="example-text">"${ex}"</div>`);
+          html += `</div>`;
+        }
+
+        el.wordCard.innerHTML = html;
+
+        if (audioUrl) {
+          document.getElementById('audioPlayBtn')?.addEventListener('click', () => {
+            new Audio(audioUrl).play().catch(() => { });
+          });
+        }
+      };
+
+      const showSkeleton = () => {
+        el.wordCard.style.display = 'block';
+        el.wordCard.innerHTML = `<div class="skeleton-block" style="width:60%"></div><div class="skeleton-block" style="width:40%"></div><div class="skeleton-block" style="height:60px"></div><div class="skeleton-block"></div><div class="skeleton-block" style="width:80%"></div>`;
+      };
+
+      // --- display word (main) ---
+      const displayWord = async (wordObj) => {
+        currentWord = wordObj;
+        addRecent(wordObj.en);
+        el.focusTitle.innerText = wordObj.en;
+        el.searchInput.value = wordObj.en;
+        el.suggestions.style.display = 'none';
+        el.welcomeView.style.display = 'none';
+        showSkeleton();
+        updateBookmarkUI();
+
+        let merged = { ...wordObj };
+        try {
+          const res = await fetch(API_BASE + encodeURIComponent(wordObj.en));
+          if (res.ok) {
+            const apiData = await res.json();
+            merged = { ...wordObj, ...apiData[0] };
+          }
+        } catch (e) { /* silent */ }
+
+        renderWordCard(merged);
+        currentWord = merged;
+        updateBookmarkUI();
+      };
+
+      const clearWelcome = () => {
+        currentWord = null;
+        el.wordCard.style.display = 'none';
+        el.welcomeView.style.display = 'block';
+        el.focusTitle.innerText = 'E2B Dictionary';
+        updateBookmarkUI();
+      };
+
+      // --- suggestion search ---
+      const doSearch = (query) => {
+        const q = query.toLowerCase().trim();
+        if (!q) { el.suggestions.style.display = 'none'; return; }
+        const matches = dictionary.filter(w => w.en.toLowerCase().startsWith(q)).slice(0, 10);
+        el.suggestions.innerHTML = matches.length ? matches.map(w => `<div class="suggestion-item" data-word="${w.en}"><span class="suggestion-word">${w.en}</span><span class="suggestion-bn">${w.bn?.[0] || ''}</span></div>`).join('') : '<div class="suggestion-item">not found</div>';
+        el.suggestions.style.display = 'block';
+      };
+
+      // --- load dictionary & enrich UI ---
+      const loadDictionary = async () => {
+        try {
+          const resp = await fetch(DICT_URL);
+          dictionary = await resp.json();
+          renderRecent();
+
+          // word of day (random)
+          if (dictionary.length) {
+            const random = dictionary[Math.floor(Math.random() * dictionary.length)];
+            el.wodWord.innerText = random.en;
+            el.wodMeaning.innerText = random.bn?.[0] || '';
+            el.wordOfDayBtn.onclick = () => displayWord(random);
+          }
+
+          // suggested words (random 8)
+          const shuffled = [...dictionary].sort(() => 0.5 - Math.random()).slice(0, 8);
+          el.suggestedWords.innerHTML = shuffled.map(w => `<button style="color:var(--text-muted);" class="suggest-tag" data-suggest="${w.en}">${w.en}</button>`).join('');
+          document.querySelectorAll('[data-suggest]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const found = dictionary.find(d => d.en === btn.dataset.suggest);
+              if (found) displayWord(found);
+            });
+          });
+        } catch (err) {
+          el.welcomeView.innerHTML = '<h3><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> offline dictionary missing</h3><p>Pull from github failed — use cached if any</p>';
+        }
+      };
+
+      // --- event listeners ---
+      el.searchInput.addEventListener('input', (e) => doSearch(e.target.value));
+      el.suggestions.addEventListener('click', (e) => {
+        const item = e.target.closest('[data-word]');
+        if (!item) return;
+        const found = dictionary.find(w => w.en === item.dataset.word);
         if (found) displayWord(found);
       });
-    });
 
-    DOM.wordOfDayBtn.addEventListener('click', () => {
-      const en = DOM.wordOfDayBtn.textContent.split(' — ')[0];
-      const found = dictionary.find((w) => w.en === en);
-      if (found) displayWord(found);
-    });
+      el.copyBtn.addEventListener('click', copyDetails);
+      el.bookmarkBtn.addEventListener('click', toggleBookmark);
+      el.themeBtn.addEventListener('click', toggleTheme);
 
-    DOM.suggestedWords.addEventListener('click', (e) => {
-      const target = e.target.closest('[data-suggest]');
-      if (!target) return;
-      const found = dictionary.find((w) => w.en === target.dataset.suggest);
-      if (found) displayWord(found);
-    });
+      el.recentList.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-recent]');
+        if (!btn) return;
+        const found = dictionary.find(w => w.en === btn.dataset.recent);
+        if (found) displayWord(found);
+      });
 
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.search-wrap')) DOM.suggestions.style.display = 'none';
-    });
+      document.querySelectorAll('[data-quick]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const word = btn.dataset.quick;
+          const found = dictionary.find(w => w.en.toLowerCase() === word);
+          if (found) displayWord(found);
+        });
+      });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === '/') {
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) el.suggestions.style.display = 'none';
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === '/') { e.preventDefault(); el.searchInput.focus(); }
+        if (e.key === 'Escape') el.suggestions.style.display = 'none';
+      });
+
+      window.addEventListener('online', () => { el.offlineBanner.style.display = 'none'; });
+      window.addEventListener('offline', () => { el.offlineBanner.style.display = 'flex'; });
+      setTheme(localStorage.getItem(THEME_KEY) === 'dark');
+
+      // PWA install
+      window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
-        DOM.searchInput.focus();
+        deferredPrompt = e;
+        el.installBtn.style.display = 'inline-flex';
+      });
+      el.installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const res = await deferredPrompt.userChoice;
+        if (res.outcome === 'accepted') el.installBtn.style.display = 'none';
+        deferredPrompt = null;
+      });
+
+      // initial load
+      if (navigator.onLine) el.offlineBanner.style.display = 'none';
+      else el.offlineBanner.style.display = 'flex';
+
+      loadDictionary();
+
+      // register service worker (keep PWA)
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => { }));
       }
-      if (e.key === 'Escape') DOM.suggestions.style.display = 'none';
-    });
-
-    window.addEventListener('online', setOnlineState);
-    window.addEventListener('offline', setOnlineState);
-
-    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      setTheme(true);
-    }
-    setOnlineState();
-    loadData().catch(() => {
-      DOM.welcomeView.innerHTML = '<h2>Dictionary unavailable</h2><p>Please check your connection and refresh.</p>';
-    });
+    })();
   </script>
 </body>
+
 </html>

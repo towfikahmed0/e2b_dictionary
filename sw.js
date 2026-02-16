@@ -1,4 +1,4 @@
-const CACHE_NAME = 'e2b-dictionary-v1.4.0';
+const CACHE_NAME = 'e2b-dictionary-v2';
 const urlsToCache = [
   '/',
   './index.html',
