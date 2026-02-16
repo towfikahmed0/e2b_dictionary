@@ -1,19 +1,18 @@
-const CACHE_NAME = 'e2b-dictionary-v1.2.0';
+const CACHE_NAME = 'e2b-dictionary-v1.3.0';
 const urlsToCache = [
   '/',
   './index.html',
   './img/logo.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://raw.githubusercontent.com/towfikahmed0/e2b_dictionary/main/dictionary.json'
+  './manifest.json'
 ];
+
+const DICTIONARY_URL = 'https://raw.githubusercontent.com/towfikahmed0/e2b_dictionary/main/dictionary.json';
 
 // Install event - cache initial resources
 self.addEventListener('install', event => {
-  console.log('Service Worker installing.');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
       .then(() => self.skipWaiting())
@@ -22,13 +21,11 @@ self.addEventListener('install', event => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
-  console.log('Service Worker activating.');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -39,17 +36,33 @@ self.addEventListener('activate', event => {
 
 // Fetch event - serve from cache or network
 self.addEventListener('fetch', event => {
-  // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin) && 
-      !event.request.url.includes('raw.githubusercontent.com') &&
-      !event.request.url.includes('cdnjs.cloudflare.com')) {
+  const url = event.request.url;
+
+  // Handle dictionary data with stale-while-revalidate
+  if (url === DICTIONARY_URL) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(cache => {
+        return cache.match(event.request).then(cachedResponse => {
+          const fetchedResponse = fetch(event.request).then(networkResponse => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+          return cachedResponse || fetchedResponse;
+        });
+      })
+    );
+    return;
+  }
+
+  // Skip cross-origin requests except for allowed ones
+  if (!url.startsWith(self.location.origin) &&
+      !url.includes('api.dictionaryapi.dev')) {
     return;
   }
 
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Return cached version or fetch from network
         if (response) {
           return response;
         }
@@ -60,21 +73,17 @@ self.addEventListener('fetch', event => {
             return response;
           }
 
-          // Clone the response
           const responseToCache = response.clone();
-
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              // Don't cache API calls to dictionary API to get fresh data
-              if (!event.request.url.includes('api.dictionaryapi.dev')) {
-                cache.put(event.request, responseToCache);
-              }
-            });
+          caches.open(CACHE_NAME).then(cache => {
+            // Don't cache API calls to dictionary API to keep fresh
+            if (!url.includes('api.dictionaryapi.dev')) {
+              cache.put(event.request, responseToCache);
+            }
+          });
 
           return response;
         });
       }).catch(() => {
-        // If both cache and network fail, show offline page
         if (event.request.mode === 'navigate') {
           return caches.match('/');
         }
@@ -85,24 +94,16 @@ self.addEventListener('fetch', event => {
 // Background sync for dictionary updates
 self.addEventListener('sync', event => {
   if (event.tag === 'dictionary-update') {
-    console.log('Background sync for dictionary data');
     event.waitUntil(updateDictionaryData());
   }
 });
 
 async function updateDictionaryData() {
   try {
-    const response = await fetch('https://raw.githubusercontent.com/towfikahmed0/e2b_dictionary/main/dictionary.json');
-    const data = await response.json();
-    
+    const response = await fetch(DICTIONARY_URL);
     const cache = await caches.open(CACHE_NAME);
-    await cache.put('https://raw.githubusercontent.com/towfikahmed0/e2b_dictionary/main/dictionary.json', new Response(JSON.stringify(data)));
-    
-    console.log('Dictionary data updated in background');
+    await cache.put(DICTIONARY_URL, response);
   } catch (error) {
-    console.error('Failed to update dictionary data:', error);
+    console.error('Background sync failed:', error);
   }
-
 }
-
-
