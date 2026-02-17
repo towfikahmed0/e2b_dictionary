@@ -641,6 +641,13 @@
       // storage helpers
       const getStorage = (key, def = []) => { try { return JSON.parse(localStorage.getItem(key)) || def; } catch { return def; } };
       const setStorage = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+      const debounce = (fn, delay) => {
+        let timeout;
+        return (...args) => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => fn(...args), delay);
+        };
+      };
 
       const RECENT_KEY = 'e2b_recent';
       const BOOKMARK_KEY = 'e2b_bookmarks';
@@ -790,8 +797,17 @@
         const q = query.toLowerCase().trim();
         selectedIndex = -1;
         if (!q) { el.suggestions.style.display = 'none'; return; }
-        const matches = dictionary.filter(w => w.en.toLowerCase().startsWith(q)).slice(0, 10);
-        el.suggestions.innerHTML = matches.length ? matches.map(w => `<div class="suggestion-item" data-word="${w.en}" role="option"><span class="suggestion-word">${w.en}</span><span class="suggestion-bn">${w.bn?.[0] || ''}</span></div>`).join('') : '<div class="suggestion-item">not found</div>';
+
+        // Optimized search loop: stops after 10 matches
+        const matches = [];
+        for (let i = 0; i < dictionary.length; i++) {
+          if (dictionary[i].enLow.startsWith(q)) {
+            matches.push(dictionary[i]);
+            if (matches.length === 10) break;
+          }
+        }
+
+        el.suggestions.innerHTML = matches.length ? matches.map(w => `<div class="suggestion-item" data-word="${w.en}"><span class="suggestion-word">${w.en}</span><span class="suggestion-bn">${w.bn?.[0] || ''}</span></div>`).join('') : '<div class="suggestion-item">not found</div>';
         el.suggestions.style.display = 'block';
       };
 
@@ -800,6 +816,10 @@
         try {
           const resp = await fetch(DICT_URL);
           dictionary = await resp.json();
+          // Pre-process for faster search
+          for (let i = 0; i < dictionary.length; i++) {
+            dictionary[i].enLow = dictionary[i].en.toLowerCase();
+          }
           renderRecent();
 
           // word of day (random)
@@ -810,8 +830,14 @@
             el.wordOfDayBtn.onclick = () => displayWord(random);
           }
 
-          // suggested words (random 8)
-          const shuffled = [...dictionary].sort(() => 0.5 - Math.random()).slice(0, 8);
+          // suggested words (random 8) - O(k) selection instead of O(N log N) sort
+          const shuffled = [];
+          const indices = new Set();
+          const count = Math.min(8, dictionary.length);
+          while (indices.size < count) {
+            indices.add(Math.floor(Math.random() * dictionary.length));
+          }
+          indices.forEach(idx => shuffled.push(dictionary[idx]));
           el.suggestedWords.innerHTML = shuffled.map(w => `<button style="color:var(--text-muted);" class="suggest-tag" data-suggest="${w.en}">${w.en}</button>`).join('');
           document.querySelectorAll('[data-suggest]').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -825,35 +851,7 @@
       };
 
       // --- event listeners ---
-      const updateSelection = (items) => {
-        items.forEach((item, idx) => {
-          item.classList.toggle('active', idx === selectedIndex);
-          item.setAttribute('aria-selected', idx === selectedIndex);
-          if (idx === selectedIndex) item.scrollIntoView({ block: 'nearest' });
-        });
-      };
-
-      el.searchInput.addEventListener('input', (e) => doSearch(e.target.value));
-      el.searchInput.addEventListener('keydown', (e) => {
-        const items = el.suggestions.querySelectorAll('.suggestion-item[data-word]');
-        if (!items.length) return;
-
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          selectedIndex = (selectedIndex + 1) % items.length;
-          updateSelection(items);
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-          updateSelection(items);
-        } else if (e.key === 'Enter') {
-          if (selectedIndex >= 0) {
-            e.preventDefault();
-            items[selectedIndex].click();
-          }
-        }
-      });
-
+      el.searchInput.addEventListener('input', debounce((e) => doSearch(e.target.value), 150));
       el.suggestions.addEventListener('click', (e) => {
         const item = e.target.closest('[data-word]');
         if (!item) return;
