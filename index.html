@@ -240,7 +240,8 @@
       transition: 0.1s;
     }
 
-    .suggestion-item:hover {
+    .suggestion-item:hover,
+    .suggestion-item.active {
       background: color-mix(in srgb, var(--primary) 10%, var(--surface));
     }
 
@@ -524,7 +525,7 @@
     <div class="sticky-header">
       <div class="header-grid">
         <div class="header-left">
-          <button id="themeBtn" class="icon-btn" title="Light/dark">
+          <button id="themeBtn" class="icon-btn" title="Light/dark" aria-label="Toggle light/dark mode">
             <svg xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
               <path
@@ -535,14 +536,14 @@
         <div id="focusTitle" class="header-center" >E2B Dictionary
         </div>
         <div class="header-right">
-          <button id="copyBtn" class="icon-btn" title="Copy meaning"><svg viewBox="0 0 24 24">
+          <button id="copyBtn" class="icon-btn" title="Copy meaning" aria-label="Copy word and meaning"><svg viewBox="0 0 24 24">
               <path
                 d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm4 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z" />
             </svg></button>
-          <button id="bookmarkBtn" class="icon-btn" title="Bookmark word"><svg viewBox="0 0 24 24">
+          <button id="bookmarkBtn" class="icon-btn" title="Bookmark word" aria-label="Bookmark this word"><svg viewBox="0 0 24 24">
               <path d="M5 2h14c1.1 0 2 .9 2 2v20l-9-4-9 4V4c0-1.1.9-2 2-2z" />
             </svg></button>
-          <button id="installBtn" class="icon-btn pill-install" style="display:none;" title="Install app"><svg
+          <button id="installBtn" class="icon-btn pill-install" style="display:none;" title="Install app" aria-label="Install as app"><svg
               viewBox="0 0 24 24">
               <path
                 d="M19 15v4H5v-4H3v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4h-2Zm-8-1.17 2.59-2.58L15 12.66l-3 3-3-3 1.41-1.41L11 13.83ZM11 3h2v9h-2V3Z" />
@@ -552,9 +553,9 @@
       <main class="center-col">
         <div class="search-container">
           <span class="search-icon"><i class="fa fa-search" aria-hidden="true"></i></span>
-          <input id="searchInput" class="search-input" type="text" placeholder="Search any English word..."
-            autocomplete="off" />
-          <div id="suggestions" class="suggestions"></div>
+          <input id="searchInput" class="search-input" type="search" placeholder="Search any English word..."
+            autocomplete="off" aria-label="Search English words" />
+          <div id="suggestions" class="suggestions" role="listbox"></div>
         </div>
         <div id="offlineBanner" class="offline-chip">📡 offline — using cached dictionary</div>
       </main>
@@ -634,6 +635,7 @@
       // data
       let dictionary = [];               // raw { en, bn, syn, ant, ... }
       let currentWord = null;
+      let selectedIndex = -1;
       let deferredPrompt;
 
       // storage helpers
@@ -793,6 +795,7 @@
       // --- suggestion search ---
       const doSearch = (query) => {
         const q = query.toLowerCase().trim();
+        selectedIndex = -1;
         if (!q) { el.suggestions.style.display = 'none'; return; }
 
         // Optimized search loop: stops after 10 matches
